@@ -225,7 +225,37 @@ void ERCMain()
     move_forward(percent, counts);
 
     percent = turn_power;
-    read_color(percent, counts)
+    read_color(percent, counts);
+
+    counts = (CPI*distance back to light);
+    percent = -drive_power;
+    move_forward(percent, counts);
+
+    counts = (CPI*2*pi*TR/2);
+    percent = turn_power;
+    turn_counterclockwise_center(percent, counts);
+
+    counts = (CPI*13.625);
+    percent = drive_power;
+    move_forward(percent, counts);
+
+    counts = (CPI*2*pi*TR/4);
+    percent = -turn_power;
+    turn_counterclockwise_center(percent, counts);
+
+    counts = (CPI*37);
+    percent = drive_power;
+    move_forward(percent, counts);
+
+    counts = (CPI*30);
+    percent = drive_power;
+    move_forward(percent, counts);
+
+
+
+
+
+
 
 
 
