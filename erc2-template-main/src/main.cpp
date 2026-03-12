@@ -119,16 +119,71 @@ while((TimeNow() - time_start) <= 30)
 }
 }
 
+void red_button(int percent, int counts)
+{
 
-void read_color ()
+    //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
+    percent = -turn_power;
+    counts = CPI*TR*2*pi/(portion of turn);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive forward to be aligned on button (CPI*distance)
+    percent = turn_power;
+    counts = CPI*distance;
+    move_forward(percent, counts);
+
+    //turn other way to face front again (needs -CPI*TR*2*pi/(portion of turn))
+    percent = turn_power;
+    counts = CPI*TR*2*pi/(portion of turn);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive into button and stay for a bit to make sure it is pressed (CPI*distance)
+    percent = turn_power;
+    counts = CPI*distance;
+    move_forward(percent, counts);
+
+}
+
+void blue_button(int percent, int counts)
+{
+   //turn to get towards blue button (needs CPI*TR*2*pi/(portion of turn))
+    percent = turn_power;
+    counts = CPI*TR*2*pi/(portion of turn);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive forward to be aligned on button (CPI*distance)
+    percent = turn_power;
+    counts = CPI*distance;
+    move_forward(percent, counts);
+
+    //turn other way to face front again (needs -CPI*TR*2*pi/(portion of turn))
+    percent = -turn_power;
+    counts = CPI*TR*2*pi/(portion of turn);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive into button and stay for a bit to make sure it is pressed (CPI*distance)
+    percent = turn_power;
+    counts = CPI*distance;
+    move_forward(percent, counts);
+
+}
+
+void read_color(int percent, int counts)
 {
 float value;
 float time_start = TimeNow();
 while((TimeNow() - time_start) <= 30)
 {
+    //read for color
     value = CdS_cell.Value();
     if((value <= ###) && (value >= ###)){
-    break;
+        red_button(percent, counts);
+        break;
+    }
+
+    else if((value <= ###) && (value >= ###)){
+        blue_button(percent, counts);
+        break;
     }
 
 }
@@ -168,6 +223,11 @@ void ERCMain()
     counts = (CPI*13.625);
     percent = drive_power;
     move_forward(percent, counts);
+
+    percent = turn_power;
+    read_color(percent, counts)
+
+
 
 
 
