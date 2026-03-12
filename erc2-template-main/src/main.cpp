@@ -15,6 +15,7 @@ void ERCMain()
     {
         float value = CdS_Cell.Value();
         LCD.Write(value);
+        Sleep(0.1);
         LCD.Clear();
 
     }
