@@ -120,8 +120,10 @@ while((TimeNow() - time_start) <= 30)
 }
 }
 
-void red_button(int percent, int counts)
+void blue_button(int percent, int counts)
 {
+    LCD.Clear();
+    LCD.Write("BLUE");
 
     //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
     percent = turn_power;
@@ -138,18 +140,25 @@ void red_button(int percent, int counts)
     turn_about_right(percent, counts);
 
     percent = turn_power;
-    counts = CPI*1;
+    counts = CPI*0.5;
     move_forward(percent, counts);
 
-    percent = -turn_power;
-    counts = CPI*5;
+    percent = -60;
+    counts = CPI*0.5;
+    move_forward(percent, counts);
+
+    percent = -drive_power;
+    counts = CPI*6;
     move_forward(percent, counts);
 
 
 }
 
-void blue_button(int percent, int counts)
+void red_button(int percent, int counts)
 {
+
+    LCD.Clear();
+    LCD.Write("RED");
 
     //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
     percent = turn_power;
@@ -166,11 +175,15 @@ void blue_button(int percent, int counts)
     turn_about_left(percent, counts);
 
     percent = turn_power;
-    counts = CPI*1;
+    counts = CPI*0.5;
     move_forward(percent, counts);
 
-    percent = -turn_power;
-    counts = CPI*5;
+    percent = -60;
+    counts = CPI*0.5;
+    move_forward(percent, counts);
+
+    percent = -drive_power;
+    counts = CPI*6;
     move_forward(percent, counts);
 
 
@@ -182,6 +195,8 @@ float value;
 float time_start = TimeNow();
 while((TimeNow() - time_start) <= 30)
 {
+
+    
     //read for color
     value = CdS_cell.Value();
     if((value <= 0.4) && (value >= 0.1)){
@@ -189,10 +204,15 @@ while((TimeNow() - time_start) <= 30)
         break;
     }
 
-    else if((value <= 1) && (value >= 0.5)){
+    else if((value <= 2) && (value >= 0.5)){
         blue_button(percent, counts);
         break;
     }
+
+    value = CdS_cell.Value();
+    LCD.Write(value);
+    LCD.Clear();
+    Sleep(0.05);
 
 }
 
@@ -218,26 +238,25 @@ void ERCMain()
     percent = turn_power;
     turn_about_right(percent, counts);
 
-    counts = (CPI*37);
+    counts = (CPI*39.5);
     percent = drive_power;
     move_forward(percent, counts);
 
-    counts = (CPI*2*pi*TR*10/36);
+    counts = (CPI*2*pi*TR*112/360);
     percent = turn_power;
     turn_counterclockwise_center(percent, counts);
 
-    counts = (CPI*13.625);
+    counts = (CPI*13.125);
     percent = drive_power;
     move_forward(percent, counts);
+
+    // percent = turn_power;
+    // red_button(percent, counts);
 
     percent = turn_power;
     read_color(percent, counts);
 
-    counts = (CPI*13.625);
-    percent = -drive_power;
-    move_forward(percent, counts);
-
-    counts = (CPI*2*pi*TR/2);
+    counts = (CPI*2*pi*TR*19/36);
     percent = turn_power;
     turn_counterclockwise_center(percent, counts);
 
@@ -249,7 +268,7 @@ void ERCMain()
     percent = -turn_power;
     turn_counterclockwise_center(percent, counts);
 
-    counts = (CPI*37);
+    counts = (CPI*40);
     percent = drive_power;
     move_forward(percent, counts);
 
