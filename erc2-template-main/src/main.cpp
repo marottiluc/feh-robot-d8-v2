@@ -206,7 +206,7 @@ void ERCMain()
     int counts;
     int percent;
 
-    // read_start();
+    read_start();
 
     counts = (CPI*1.5);
     percent = -drive_power/2;
@@ -231,14 +231,11 @@ void ERCMain()
     move_forward(percent, counts);
 
     percent = turn_power;
-    red_button(percent, counts);
+    read_color(percent, counts);
 
-    // percent = turn_power;
-    // read_color(percent, counts);
-
-    // counts = (CPI*distance back to light);
-    // percent = -drive_power;
-    // move_forward(percent, counts);
+    counts = (CPI*13.625);
+    percent = -drive_power;
+    move_forward(percent, counts);
 
     counts = (CPI*2*pi*TR/2);
     percent = turn_power;
