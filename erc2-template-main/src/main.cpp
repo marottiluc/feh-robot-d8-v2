@@ -242,11 +242,11 @@ void ERCMain()
     percent = drive_power;
     move_forward(percent, counts);
 
-    counts = (CPI*2*pi*TR*112/360);
+    counts = (CPI*2*pi*TR*11/36);
     percent = turn_power;
     turn_counterclockwise_center(percent, counts);
 
-    counts = (CPI*13.125);
+    counts = (CPI*13.375);
     percent = drive_power;
     move_forward(percent, counts);
 
