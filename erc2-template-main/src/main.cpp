@@ -199,12 +199,12 @@ while((TimeNow() - time_start) <= 30)
     
     //read for color
     value = CdS_cell.Value();
-    if((value <= 0.4) && (value >= 0.1)){
+    if(value <= 0.5){
         red_button(percent, counts);
         break;
     }
 
-    else if((value <= 2) && (value >= 0.5)){
+    else {
         blue_button(percent, counts);
         break;
     }
@@ -246,8 +246,12 @@ void ERCMain()
     percent = turn_power;
     turn_counterclockwise_center(percent, counts);
 
-    counts = (CPI*13.375);
-    percent = drive_power;
+    counts = (CPI*8);
+    percent = -turn_power;
+    move_forward(percent, counts);
+
+    counts = (CPI*18.425);
+    percent = turn_power;
     move_forward(percent, counts);
 
     // percent = turn_power;
