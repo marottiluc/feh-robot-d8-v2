@@ -226,9 +226,28 @@ while((TimeNow() - time_start) <= 30)
 
 }
 
-void follow_line ()
+void follow_line (int percent)
 {
  float right_value, center_value, left_value;
+
+ while(true)
+ {
+    //black lines >4, all else <4
+    // right_value = right_opto.Value();
+    // center_value = center_opto.Value();
+    // left_value = left_opto.Value();
+
+    if(right_opto.Value() <= 4){
+
+    }
+    else if (left_opto.Value() <=4){
+
+    }
+    else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4)){
+
+    }
+
+ }
 
 
 
