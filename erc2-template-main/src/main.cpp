@@ -20,7 +20,7 @@ DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
-AnalogInputPin CdS_cell(FEHIO::Pin0);
+AnalogInputPin CdS_cell(FEHIO::Pin4);
 FEHServo arm_servo(FEHServo::Servo0);
 AnalogInputPin right_opto(FEHIO::Pin5);
 AnalogInputPin center_opto(FEHIO::Pin6);
@@ -227,44 +227,44 @@ while((TimeNow() - time_start) <= 30)
 }
 
 
-void follow_line (int percent)
-{
-    float right_value, center_value, left_value;
+// void follow_line (int percent)
+// {
+//     float right_value, center_value, left_value;
 
-    while(true)
-    {
-    //black lines >4, all else <4
-    // right_value = right_opto.Value();
-    // center_value = center_opto.Value();
-    // left_value = left_opto.Value();
-        if(center_opto.Value() > 4)
-        {
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent);
-        }
+//     while(true)
+//     {
+//     //black lines >4, all else <4
+//     // right_value = right_opto.Value();
+//     // center_value = center_opto.Value();
+//     // left_value = left_opto.Value();
+//         if(center_opto.Value() > 4)
+//         {
+//         right_motor.SetPercent(percent);
+//         left_motor.SetPercent(percent);
+//         }
 
-        else if(right_opto.Value() <= 4)
-        {
-        right_motor.Stop();
-        left_motor.SetPercent(percent);
-        }
+//         else if(right_opto.Value() <= 4)
+//         {
+//         right_motor.Stop();
+//         left_motor.SetPercent(percent);
+//         }
 
-        else if (left_opto.Value() <= 4)
-        {
-        left_motor.Stop();
-        right_motor.SetPercent(percent);
-        }
+//         else if (left_opto.Value() <= 4)
+//         {
+//         left_motor.Stop();
+//         right_motor.SetPercent(percent);
+//         }
 
-        else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4))
-        {
-        right_motor.Stop();
-        left_motor.Stop();
-        }
+//         else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4))
+//         {
+//         right_motor.Stop();
+//         left_motor.Stop();
+//         }
 
-    }
+//     }
 
 
-}
+// }
 
 
 
@@ -273,13 +273,14 @@ void ERCMain()
   //counts/inch for 3" wheels : 33.74
     int counts;
     int percent;
-    float degree;
 
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
 
-    //read start light
-    read_start();
+    arm_servo.SetDegree(180.);
+
+    // //read start light
+    // read_start();
 
     //back into start button
     counts = (CPI*1.5);
@@ -313,14 +314,14 @@ void ERCMain()
     percent = -turn_power;
     move_forward(percent, counts);
 
-    //follow until reaches end of line
-    percent = 15;
-    follow_line(percent);
+    // //follow until reaches end of line
+    // percent = 15;
+    // follow_line(percent);
 
-    //replace line following with shaft encoding
-    // counts = (CPI*18.425); //measurement needs to be tested
-    // percent = turn_power;
-    // move_forward(percent, counts);
+    // replace line following with shaft encoding
+    counts = (CPI*18.425); //measurement needs to be tested
+    percent = turn_power;
+    move_forward(percent, counts);
 
     //10 in away from buttons
     counts = (CPI*10); //fill in distance til window is fully open
