@@ -22,6 +22,9 @@ FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 AnalogInputPin CdS_cell(FEHIO::Pin0);
 FEHServo arm_servo(FEHServo::Servo0);
+AnalogInputPin right_opto(FEHIO::Pin5);
+AnalogInputPin center_opto(FEHIO::Pin6);
+AnalogInputPin left_opto(FEHIO::Pin7);
 
 void move_forward(int percent, int counts) //using encoders
 {
@@ -223,6 +226,15 @@ while((TimeNow() - time_start) <= 30)
 
 }
 
+void follow_line ()
+{
+ float right_value, center_value, left_value;
+
+
+
+}
+
+
 
 void ERCMain()
 {
@@ -230,60 +242,71 @@ void ERCMain()
   //counts/inch for 3" wheels : 33.74
     int counts;
     int percent;
+    float degree;
 
-    read_start();
+    // arm_servo.SetMin(servo_min);
+    // arm_servo.SetMax(servo_max);
 
-    counts = (CPI*1.5);
-    percent = -drive_power/2;
-    move_forward(percent, counts);
+    // read_start();
 
-    Sleep(0.25);
+    // counts = (CPI*1.5);
+    // percent = -drive_power/2;
+    // move_forward(percent, counts);
 
-    counts = (CPI*2*pi*2*TR/8);
-    percent = turn_power;
-    turn_about_right(percent, counts);
+    // Sleep(0.25);
 
-    counts = (CPI*39.5);
-    percent = drive_power;
-    move_forward(percent, counts);
+    // counts = (CPI*2*pi*2*TR/8);
+    // percent = turn_power;
+    // turn_about_right(percent, counts);
 
-    counts = (CPI*2*pi*TR*11/36);
-    percent = turn_power;
-    turn_counterclockwise_center(percent, counts);
+    // counts = (CPI*39.5);
+    // percent = drive_power;
+    // move_forward(percent, counts);
 
-    counts = (CPI*8);
-    percent = -turn_power;
-    move_forward(percent, counts);
+    // counts = (CPI*2*pi*TR*11/36);
+    // percent = turn_power;
+    // turn_counterclockwise_center(percent, counts);
 
-    counts = (CPI*18.425);
-    percent = turn_power;
-    move_forward(percent, counts);
+    // counts = (CPI*8);
+    // percent = -turn_power;
+    // move_forward(percent, counts);
+
+    // counts = (CPI*18.425);
+    // percent = turn_power;
+    // move_forward(percent, counts);
 
     // percent = turn_power;
-    // red_button(percent, counts);
+    // read_color(percent, counts);
 
-    percent = turn_power;
-    read_color(percent, counts);
+    // counts = (CPI*2*pi*TR*19/36);
+    // percent = turn_power;
+    // turn_counterclockwise_center(percent, counts);
 
-    counts = (CPI*2*pi*TR*19/36);
-    percent = turn_power;
-    turn_counterclockwise_center(percent, counts);
+    // counts = (CPI*13.625);
+    // percent = drive_power;
+    // move_forward(percent, counts);
 
-    counts = (CPI*13.625);
-    percent = drive_power;
-    move_forward(percent, counts);
+    // counts = (CPI*2*pi*TR/4);
+    // percent = -turn_power;
+    // turn_counterclockwise_center(percent, counts);
 
-    counts = (CPI*2*pi*TR/4);
-    percent = -turn_power;
-    turn_counterclockwise_center(percent, counts);
+    // counts = (CPI*40);
+    // percent = drive_power;
+    // move_forward(percent, counts);
 
-    counts = (CPI*40);
-    percent = drive_power;
-    move_forward(percent, counts);
+    // counts = (CPI*30);
+    // percent = drive_power;
+    // move_forward(percent, counts);
 
-    counts = (CPI*30);
-    percent = drive_power;
-    move_forward(percent, counts);
+while(true){
+LCD.Write(right_opto.Value());
+LCD.Write(center_opto.Value());
+LCD.Write(left_opto.Value());
+
+Sleep(0.5);
+LCD.Clear();
+
+}
 
 
 
