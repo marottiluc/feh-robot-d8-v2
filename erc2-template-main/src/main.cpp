@@ -229,36 +229,36 @@ while((TimeNow() - time_start) <= 30)
 
 void follow_line (int percent)
 {
-float right_value, center_value, left_value;
+    float right_value, center_value, left_value;
 
-while(true)
-{
-//black lines >4, all else <4
-// right_value = right_opto.Value();
-// center_value = center_opto.Value();
-// left_value = left_opto.Value();
-if(center_opto.Value() > 4)
-{
-right_motor.SetPercent(percent);
-left_motor.SetPercent(percent);
-}
-else if(right_opto.Value() <= 4)
-{
-right_motor.Stop();
-left_motor.SetPercent(percent);
-}
-else if (left_opto.Value() <= 4)
-{
-left_motor.Stop();
-right_motor.SetPercent(percent);
-}
-else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4))
-{
-right_motor.Stop();
-left_motor.Stop();
-}
+    while(true)
+    {
+    //black lines >4, all else <4
+    // right_value = right_opto.Value();
+    // center_value = center_opto.Value();
+    // left_value = left_opto.Value();
+        if(center_opto.Value() > 4)
+        {
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(percent);
+        }
+        else if(right_opto.Value() <= 4)
+        {
+        right_motor.Stop();
+        left_motor.SetPercent(percent);
+        }
+        else if (left_opto.Value() <= 4)
+        {
+        left_motor.Stop();
+        right_motor.SetPercent(percent);
+        }
+        else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4))
+        {
+        right_motor.Stop();
+        left_motor.Stop();
+        }
 
-}
+    }
 
 
 }
@@ -267,7 +267,6 @@ left_motor.Stop();
 
 void ERCMain()
 {
-
   //counts/inch for 3" wheels : 33.74
     int counts;
     int percent;
@@ -276,40 +275,71 @@ void ERCMain()
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
 
+    //read start light
     read_start();
 
+    //bakc into start button
     counts = (CPI*1.5);
     percent = -drive_power/2;
     move_forward(percent, counts);
 
     Sleep(0.25);
 
+    //turn to align w ramp
     counts = (CPI*2*pi*2*TR/8);
     percent = turn_power;
     turn_about_right(percent, counts);
 
+    //drive forward to reach 90 degree turn
     counts = (CPI*39.5); //modify to end at start of line
     percent = drive_power;
     move_forward(percent, counts);
 
-    //follow until reaches end of line
-    //maybe have to drive backwards afterward to align w window? test this
+    //align parallel to buttons to readjust w wall
+    counts = (CPI*2*pi*TR*11/36);
+    percent = -turn_power;
+    turn_counterclockwise_center(percent, counts);
 
-    arm_servo.SetDegree(90.);
-
-    counts = (CPI*distance); //fill in distance til window is fully open
+    //back into wall
+    counts = (CPI*5); //troubleshoot
     percent = turn_power;
     move_forward(percent, counts);
 
+    //move forward to catch line
+    counts = (CPI*6); //change with testing
+    percent = -turn_power;
+    move_forward(percent, counts);
+
+    //follow until reaches end of line
+    percent = turn_power;
+    follow_line(percent);
+
+    //10 in away from buttons
+    counts = (CPI*10); //fill in distance til window is fully open
+    percent = turn_power;
+    move_forward(percent, counts);
+
+    //lower hook arm
+    arm_servo.SetDegree(90.);
+
+    //4.5 in towards buttons to open window
+    counts = (CPI*4.5); //fill in distance til window is fully open
+    percent = -turn_power;
+    move_forward(percent, counts);
+
+    //raise hook arm
     arm_servo.SetDegree(0.);
 
-    counts = (CPI*distance); //fill in width of window handle
+    //1 in to get around handle
+    counts = (CPI*1); //fill in width of window handle
     percent = turn_power;
     move_forward(percent, counts);
 
+    //lower hook arm
     arm_servo.SetDegree(90.);
 
-    counts = (CPI*distance); //fill in distance til window is fully closed
+    //4.5 in to close window (w/ added buffer)
+    counts = (CPI*5); //fill in distance til window is fully closed
     percent = -turn_power;
     move_forward(percent, counts);
 
@@ -349,15 +379,6 @@ void ERCMain()
     // percent = drive_power;
     // move_forward(percent, counts);
 
-while(true){
-LCD.Write(right_opto.Value());
-LCD.Write(center_opto.Value());
-LCD.Write(left_opto.Value());
-
-Sleep(0.5);
-LCD.Clear();
-
-}
 
 
 
