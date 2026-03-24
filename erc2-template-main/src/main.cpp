@@ -11,6 +11,8 @@
 #define pi 3.14159
 #define turn_power -25
 #define drive_power -40
+#define servo_min 500
+#define servo_max 1322
 
 //Declarations for encoders & motors
 //left and right as view from the front 
@@ -224,7 +226,8 @@ while((TimeNow() - time_start) <= 30)
 
 void ERCMain()
 {
-    //counts/inch for 3" wheels : 33.74
+
+  //counts/inch for 3" wheels : 33.74
     int counts;
     int percent;
 
@@ -281,21 +284,6 @@ void ERCMain()
     counts = (CPI*30);
     percent = drive_power;
     move_forward(percent, counts);
-
-
-
-
-
-
-
-
-
-
-
-   
-
-
-
 
 
 
