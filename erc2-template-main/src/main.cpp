@@ -4,6 +4,7 @@
 #include <FEHMotor.h>
 #include <FEHRCS.h>
 #include <FEHSD.h>
+#include <FEHservo.h>
 
 #define CPI 33.74
 #define TR 3.5
@@ -18,6 +19,7 @@ DigitalEncoder left_encoder(FEHIO::Pin9);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 AnalogInputPin CdS_cell(FEHIO::Pin0);
+FEHServo arm_servo(FEHServo::Servo0);
 
 void move_forward(int percent, int counts) //using encoders
 {
