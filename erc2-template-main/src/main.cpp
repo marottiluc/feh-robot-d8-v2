@@ -254,7 +254,7 @@ void follow_line (int percent)
         left_motor.Stop();
         right_motor.SetPercent(percent);
         }
-        
+
         else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4))
         {
         right_motor.Stop();
@@ -314,8 +314,13 @@ void ERCMain()
     move_forward(percent, counts);
 
     //follow until reaches end of line
-    percent = turn_power;
+    percent = 15;
     follow_line(percent);
+
+    //replace line following with shaft encoding
+    // counts = (CPI*18.425); //measurement needs to be tested
+    // percent = turn_power;
+    // move_forward(percent, counts);
 
     //10 in away from buttons
     counts = (CPI*10); //fill in distance til window is fully open
