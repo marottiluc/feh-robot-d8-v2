@@ -11,8 +11,8 @@
 #define pi 3.14159
 #define turn_power -25
 #define drive_power -40
-#define servo_min 500
-#define servo_max 1322
+#define servo_min 1322
+#define servo_max 2279
 
 //Declarations for encoders & motors
 //left and right as view from the front 
@@ -336,7 +336,7 @@ void ERCMain()
     move_forward(percent, counts);
 
     //raise hook arm
-    arm_servo.SetDegree(0.);
+    arm_servo.SetDegree(180.);
 
     //1 in to get around handle
     counts = (CPI*1); //fill in width of window handle
