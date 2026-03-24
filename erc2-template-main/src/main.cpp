@@ -242,16 +242,19 @@ void follow_line (int percent)
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
         }
+
         else if(right_opto.Value() <= 4)
         {
         right_motor.Stop();
         left_motor.SetPercent(percent);
         }
+
         else if (left_opto.Value() <= 4)
         {
         left_motor.Stop();
         right_motor.SetPercent(percent);
         }
+        
         else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4))
         {
         right_motor.Stop();
@@ -278,7 +281,7 @@ void ERCMain()
     //read start light
     read_start();
 
-    //bakc into start button
+    //back into start button
     counts = (CPI*1.5);
     percent = -drive_power/2;
     move_forward(percent, counts);
