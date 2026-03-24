@@ -226,29 +226,39 @@ while((TimeNow() - time_start) <= 30)
 
 }
 
+
 void follow_line (int percent)
 {
- float right_value, center_value, left_value;
+float right_value, center_value, left_value;
 
- while(true)
- {
-    //black lines >4, all else <4
-    // right_value = right_opto.Value();
-    // center_value = center_opto.Value();
-    // left_value = left_opto.Value();
+while(true)
+{
+//black lines >4, all else <4
+// right_value = right_opto.Value();
+// center_value = center_opto.Value();
+// left_value = left_opto.Value();
+if(center_opto.Value() > 4)
+{
+right_motor.SetPercent(percent);
+left_motor.SetPercent(percent);
+}
+else if(right_opto.Value() <= 4)
+{
+right_motor.Stop();
+left_motor.SetPercent(percent);
+}
+else if (left_opto.Value() <= 4)
+{
+left_motor.Stop();
+right_motor.SetPercent(percent);
+}
+else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4))
+{
+right_motor.Stop();
+left_motor.Stop();
+}
 
-    if(right_opto.Value() <= 4){
-
-    }
-    else if (left_opto.Value() <=4){
-
-    }
-    else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4)){
-
-    }
-
- }
-
+}
 
 
 }
@@ -263,24 +273,46 @@ void ERCMain()
     int percent;
     float degree;
 
-    // arm_servo.SetMin(servo_min);
-    // arm_servo.SetMax(servo_max);
+    arm_servo.SetMin(servo_min);
+    arm_servo.SetMax(servo_max);
 
-    // read_start();
+    read_start();
 
-    // counts = (CPI*1.5);
-    // percent = -drive_power/2;
-    // move_forward(percent, counts);
+    counts = (CPI*1.5);
+    percent = -drive_power/2;
+    move_forward(percent, counts);
 
-    // Sleep(0.25);
+    Sleep(0.25);
 
-    // counts = (CPI*2*pi*2*TR/8);
-    // percent = turn_power;
-    // turn_about_right(percent, counts);
+    counts = (CPI*2*pi*2*TR/8);
+    percent = turn_power;
+    turn_about_right(percent, counts);
 
-    // counts = (CPI*39.5);
-    // percent = drive_power;
-    // move_forward(percent, counts);
+    counts = (CPI*39.5); //modify to end at start of line
+    percent = drive_power;
+    move_forward(percent, counts);
+
+    //follow until reaches end of line
+    //maybe have to drive backwards afterward to align w window? test this
+
+    arm_servo.SetDegree(90.);
+
+    counts = (CPI*distance); //fill in distance til window is fully open
+    percent = turn_power;
+    move_forward(percent, counts);
+
+    arm_servo.SetDegree(0.);
+
+    counts = (CPI*distance); //fill in width of window handle
+    percent = turn_power;
+    move_forward(percent, counts);
+
+    arm_servo.SetDegree(90.);
+
+    counts = (CPI*distance); //fill in distance til window is fully closed
+    percent = -turn_power;
+    move_forward(percent, counts);
+
 
     // counts = (CPI*2*pi*TR*11/36);
     // percent = turn_power;
