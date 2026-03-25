@@ -270,9 +270,11 @@ while((TimeNow() - time_start) <= 30)
 
 void ERCMain()
 {
+
   //counts/inch for 3" wheels : 33.74
     int counts;
     int percent;
+
 
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
@@ -295,7 +297,7 @@ void ERCMain()
     turn_about_right(percent, counts);
 
     //drive forward to reach 90 degree turn
-    counts = (CPI*39.5); //modify to end at start of line
+    counts = (CPI*40.5); //modify to end at start of line
     percent = drive_power;
     move_forward(percent, counts);
 
@@ -309,10 +311,10 @@ void ERCMain()
     percent = turn_power;
     move_forward(percent, counts);
 
-    //move forward to catch line
-    counts = (CPI*6); //change with testing
-    percent = -turn_power;
-    move_forward(percent, counts);
+    // //move forward to catch line
+    // counts = (CPI*6); //change with testing
+    // percent = -turn_power;
+    // move_forward(percent, counts);
 
     // //follow until reaches end of line
     // percent = 15;
@@ -320,16 +322,20 @@ void ERCMain()
 
     // replace line following with shaft encoding
     counts = (CPI*18.425); //measurement needs to be tested
-    percent = turn_power;
+    percent = -turn_power;
     move_forward(percent, counts);
 
     //10 in away from buttons
     counts = (CPI*10); //fill in distance til window is fully open
-    percent = turn_power;
+    percent = -turn_power;
     move_forward(percent, counts);
 
     //lower hook arm
-    arm_servo.SetDegree(90.);
+    int i = 0;
+    for(i=0; i<90; i++){
+        arm_servo.SetDegree(180-i);
+        Sleep(0.01);
+    }
 
     //4.5 in towards buttons to open window
     counts = (CPI*4.5); //fill in distance til window is fully open
@@ -337,7 +343,10 @@ void ERCMain()
     move_forward(percent, counts);
 
     //raise hook arm
-    arm_servo.SetDegree(180.);
+    for(i=0; i<90; i++){
+        arm_servo.SetDegree(90+i);
+        Sleep(0.01);
+    }
 
     //1 in to get around handle
     counts = (CPI*1); //fill in width of window handle
@@ -345,7 +354,10 @@ void ERCMain()
     move_forward(percent, counts);
 
     //lower hook arm
-    arm_servo.SetDegree(90.);
+   for(i=0; i<90; i++){
+        arm_servo.SetDegree(180-i);
+        Sleep(0.01);
+    }
 
     //4.5 in to close window (w/ added buffer)
     counts = (CPI*5); //fill in distance til window is fully closed
