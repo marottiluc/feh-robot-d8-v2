@@ -45,6 +45,25 @@ void move_forward(int percent, int counts) //using encoders
     left_motor.Stop();
 }
 
+void move_forward_var(int percent_R, int percent_L, int counts) //using encoders
+{
+    // Reset encoder counts
+    right_encoder.ResetCounts();
+    left_encoder.ResetCounts();
+
+    // Set both motors to desired percent
+    right_motor.SetPercent(percent_R);
+    left_motor.SetPercent(percent_L);
+
+    // While the average of the left and right encoder are less than counts,
+    // keep running motors
+    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts);
+
+    // Turn off motors
+    right_motor.Stop();
+    left_motor.Stop();
+}
+
 /*
  * Turn counterclockwise using shaft encoders where percent is the motor percent and counts is the distance to travel
  */
@@ -274,6 +293,7 @@ void ERCMain()
   //counts/inch for 3" wheels : 33.74
     int counts;
     int percent;
+    int percent_R, percent_L;
 
 
     arm_servo.SetMin(servo_min);
@@ -281,8 +301,8 @@ void ERCMain()
 
     arm_servo.SetDegree(180.);
 
-    // //read start light
-    // read_start();
+    //read start light
+    read_start();
 
     //back into start button
     counts = (CPI*1.5);
@@ -297,7 +317,7 @@ void ERCMain()
     turn_about_right(percent, counts);
 
     //drive forward to reach 90 degree turn
-    counts = (CPI*40.5); //modify to end at start of line
+    counts = (CPI*37.25); //modify to end at start of line
     percent = drive_power;
     move_forward(percent, counts);
 
@@ -307,9 +327,11 @@ void ERCMain()
     turn_counterclockwise_center(percent, counts);
 
     //back into wall
-    counts = (CPI*5); //troubleshoot
-    percent = turn_power;
+    counts = (CPI*4); //troubleshoot
+    percent = drive_power;
     move_forward(percent, counts);
+
+    Sleep(0.5);
 
     // //move forward to catch line
     // counts = (CPI*6); //change with testing
@@ -320,49 +342,52 @@ void ERCMain()
     // percent = 15;
     // follow_line(percent);
 
-    // replace line following with shaft encoding
-    counts = (CPI*18.425); //measurement needs to be tested
-    percent = -turn_power;
+    //dislodge
+    counts = (CPI*1); //troubleshoot
+    percent = -drive_power;
     move_forward(percent, counts);
 
-    //10 in away from buttons
-    counts = (CPI*10); //fill in distance til window is fully open
-    percent = -turn_power;
-    move_forward(percent, counts);
 
     //lower hook arm
     int i = 0;
-    for(i=0; i<90; i++){
+    for(i=0; i<80; i++){
         arm_servo.SetDegree(180-i);
         Sleep(0.01);
     }
 
-    //4.5 in towards buttons to open window
-    counts = (CPI*4.5); //fill in distance til window is fully open
+     // replace line following with shaft encoding
+    counts = (CPI*15); //measurement needs to be tested
     percent = -turn_power;
     move_forward(percent, counts);
 
+
+    //4.5 in towards buttons to open window
+    counts = (CPI*7.25); //fill in distance til window is fully open
+    percent_L = -(turn_power);
+    percent_R = -(turn_power-10);
+    move_forward_var(percent_R, percent_L, counts);
+
     //raise hook arm
-    for(i=0; i<90; i++){
-        arm_servo.SetDegree(90+i);
+    for(i=0; i<80; i++){
+        arm_servo.SetDegree(100+i);
         Sleep(0.01);
     }
 
     //1 in to get around handle
-    counts = (CPI*1); //fill in width of window handle
-    percent = turn_power;
+    counts = (CPI*0.5); //fill in width of window handle
+    percent = -turn_power;
     move_forward(percent, counts);
 
     //lower hook arm
-   for(i=0; i<90; i++){
+    for(i=0; i<80; i++){
         arm_servo.SetDegree(180-i);
         Sleep(0.01);
     }
 
-    //4.5 in to close window (w/ added buffer)
-    counts = (CPI*5); //fill in distance til window is fully closed
-    percent = -turn_power;
-    move_forward(percent, counts);
+    counts = (CPI*10); //fill in distance til window is fully open
+    percent_L = (turn_power);
+    percent_R = (turn_power-5);
+    move_forward_var(percent_R, percent_L, counts);
 
 
     // counts = (CPI*2*pi*TR*11/36);
