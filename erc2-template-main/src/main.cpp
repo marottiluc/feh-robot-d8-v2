@@ -20,11 +20,11 @@ DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
-AnalogInputPin CdS_cell(FEHIO::Pin4);
+AnalogInputPin CdS_cell(FEHIO::Pin3);
 FEHServo arm_servo(FEHServo::Servo0);
-AnalogInputPin right_opto(FEHIO::Pin5);
+AnalogInputPin left_opto(FEHIO::Pin5);
 AnalogInputPin center_opto(FEHIO::Pin6);
-AnalogInputPin left_opto(FEHIO::Pin7);
+AnalogInputPin right_opto(FEHIO::Pin7);
 
 void move_forward(int percent, int counts) //using encoders
 {
@@ -246,44 +246,55 @@ while((TimeNow() - time_start) <= 30)
 }
 
 
-// void follow_line (int percent)
-// {
-//     float right_value, center_value, left_value;
+void follow_line (int percent)
+{
+    float right_value, center_value, left_value;
 
-//     while(true)
-//     {
-//     //black lines >4, all else <4
-//     // right_value = right_opto.Value();
-//     // center_value = center_opto.Value();
-//     // left_value = left_opto.Value();
-//         if(center_opto.Value() > 4)
-//         {
-//         right_motor.SetPercent(percent);
-//         left_motor.SetPercent(percent);
-//         }
-
-//         else if(right_opto.Value() <= 4)
-//         {
-//         right_motor.Stop();
-//         left_motor.SetPercent(percent);
-//         }
-
-//         else if (left_opto.Value() <= 4)
-//         {
-//         left_motor.Stop();
-//         right_motor.SetPercent(percent);
-//         }
-
-//         else if ((left_opto.Value() <= 4) && (center_opto.Value() <=4) && (right_opto.Value() <=4))
-//         {
-//         right_motor.Stop();
-//         left_motor.Stop();
-//         }
-
-//     }
+    while(true)
+    {
+    //black lines >4, all else <4
+    // right_value = right_opto.Value();
+    // center_value = center_opto.Value();
+    // left_value = left_opto.Value();
 
 
-// }
+        if((right_opto.Value() >= 4.8))
+        {
+        right_motor.Stop();
+        left_motor.SetPercent(percent);
+        }
+
+        else if ((left_opto.Value() >= 4.8))
+        {
+        left_motor.Stop();
+        right_motor.SetPercent(percent);
+        }
+
+        else if(center_opto.Value() > 4.8)
+        {
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(percent);
+        }
+
+
+        // else if ((left_opto.Value() <= 4.8) && (center_opto.Value() <=4.8) && (right_opto.Value() <=4.8))
+        // {
+        // right_motor.Stop();
+        // left_motor.Stop();
+        // break;
+        // }
+
+
+        LCD.Write(right_opto.Value());
+        LCD.Write(center_opto.Value());
+        LCD.Write(left_opto.Value());
+        LCD.Clear();
+
+
+    }
+
+
+}
 
 
 
@@ -294,6 +305,9 @@ void ERCMain()
     int counts;
     int percent;
     int percent_R, percent_L;
+
+    percent = turn_power;
+    follow_line(percent);
 
 
     arm_servo.SetMin(servo_min);
