@@ -157,14 +157,14 @@ void check_y(float y_coordinate, int orientation)
 
     // Check if receiving proper RCS coordinates and whether the robot is within an acceptable range
     for (int i = 0; i < 10; i++) {
-        while(pose != nullptr && (pose->y < y_coordinate - 1 || pose->y > y_coordinate + 1))
+        if(pose->y > 0 && (pose->y < y_coordinate - 1 || pose->y > y_coordinate + 1))
         {
-            if(pose->y > y_coordinate + 1)
+            if(pose->y > y_coordinate)
             {
                 // Pulse the motors for a short duration in the correct direction
                 pulse_forward(-power, PULSE_TIME);
             }
-            else if(pose->y < y_coordinate - 1)
+            else if(pose->y < y_coordinate)
             {
                 // Pulse the motors for a short duration in the correct direction
             pulse_forward(power, PULSE_TIME);
@@ -200,7 +200,7 @@ void check_heading(float heading, int orientation)
 
     // Check if receiving proper RCS coordinates and whether the robot is within an acceptable range
     for (int i = 0; i < 10; i++) {
-        while(pose != nullptr && (pose->heading < heading - 1 || pose->heading > heading + 1))
+        while(pose->heading && (pose->heading < heading - 1 || pose->heading > heading + 1))
         {
             if(pose->heading > heading + 1)
             {
@@ -227,7 +227,7 @@ void ERCMain()
     float A_heading, B_heading, C_heading, D_heading;
     int B_C_counts, C_D_counts, turn_90_counts, A_B_counts;
 
-    RCS.InitializeTouchMenu("0800A1KDN");
+    RCS.InitializeTouchMenu("Z1TESTING");
 
     LCD.WriteLine("RCS & Data Logging Test");
     LCD.WriteLine("Press Screen To Start");
@@ -267,17 +267,18 @@ void ERCMain()
     // A --> B
     move_forward(POWER, A_B_counts);
     check_y(B_y, PLUS);
+    turn_counterclockwise(POWER, turn_90_counts);
     check_heading(B_heading, PLUS);
 
     // B --> C
     move_forward(POWER, B_C_counts);
     check_x(C_x, MINUS);
     turn_counterclockwise(POWER, turn_90_counts);
-    check_heading(C_heading, MINUS);
+    check_heading(C_heading, PLUS);
 
     // C --> D
     move_forward(POWER, C_D_counts);
     check_y(D_y, MINUS);
     turn_counterclockwise(POWER, turn_90_counts);
-    check_heading(D_heading, MINUS);
+    check_heading(D_heading, PLUS);
 }
