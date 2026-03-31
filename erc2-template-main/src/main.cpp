@@ -322,21 +322,6 @@ void ERCMain()
     int percent;
     int percent_R, percent_L;
 
-    // while(true){
-    //     LCD.Write(right_opto.Value());
-    //     LCD.Write(center_opto.Value());
-    //     LCD.Write(left_opto.Value());
-
-    //     Sleep(0.5);
-    //     LCD.Clear();
-
-        
-    // }
-
-    percent = turn_power;
-    follow_line(percent);
-
-
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
 
@@ -352,124 +337,23 @@ void ERCMain()
 
     Sleep(0.25);
 
-    //turn to align w ramp
-    counts = (CPI*2*pi*2*TR/8);
-    percent = turn_power;
-    turn_about_right(percent, counts);
 
-    //drive forward to reach 90 degree turn
-    counts = (CPI*37.25); //modify to end at start of line
-    percent = drive_power;
-    move_forward(percent, counts);
 
-    //align parallel to buttons to readjust w wall
-    counts = (CPI*2*pi*TR*11/36);
-    percent = -turn_power;
-    turn_counterclockwise_center(percent, counts);
 
-    //back into wall
-    counts = (CPI*4); //troubleshoot
-    percent = drive_power;
-    move_forward(percent, counts);
 
-    Sleep(0.5);
+    // testing protocols for optosensors
+       // while(true){
+    //     LCD.Write(right_opto.Value());
+    //     LCD.Write(center_opto.Value());
+    //     LCD.Write(left_opto.Value());
 
-    // //move forward to catch line
-    // counts = (CPI*6); //change with testing
-    // percent = -turn_power;
-    // move_forward(percent, counts);
+    //     Sleep(0.5);
+    //     LCD.Clear();
 
-    // //follow until reaches end of line
-    // percent = 15;
+        
+    // }
+
+    // percent = turn_power;
     // follow_line(percent);
-
-    //dislodge
-    counts = (CPI*1); //troubleshoot
-    percent = -drive_power;
-    move_forward(percent, counts);
-
-
-    //lower hook arm
-    int i = 0;
-    for(i=0; i<80; i++){
-        arm_servo.SetDegree(180-i);
-        Sleep(0.01);
-    }
-
-     // replace line following with shaft encoding
-    counts = (CPI*15); //measurement needs to be tested
-    percent = -turn_power;
-    move_forward(percent, counts);
-
-
-    //4.5 in towards buttons to open window
-    counts = (CPI*7.25); //fill in distance til window is fully open
-    percent_L = -(turn_power);
-    percent_R = -(turn_power-10);
-    move_forward_var(percent_R, percent_L, counts);
-
-    //raise hook arm
-    for(i=0; i<80; i++){
-        arm_servo.SetDegree(100+i);
-        Sleep(0.01);
-    }
-
-    //1 in to get around handle
-    counts = (CPI*0.5); //fill in width of window handle
-    percent = -turn_power;
-    move_forward(percent, counts);
-
-    //lower hook arm
-    for(i=0; i<80; i++){
-        arm_servo.SetDegree(180-i);
-        Sleep(0.01);
-    }
-
-    counts = (CPI*10); //fill in distance til window is fully open
-    percent_L = (turn_power);
-    percent_R = (turn_power-5);
-    move_forward_var(percent_R, percent_L, counts);
-
-
-    // counts = (CPI*2*pi*TR*11/36);
-    // percent = turn_power;
-    // turn_counterclockwise_center(percent, counts);
-
-    // counts = (CPI*8);
-    // percent = -turn_power;
-    // move_forward(percent, counts);
-
-    // counts = (CPI*18.425);
-    // percent = turn_power;
-    // move_forward(percent, counts);
-
-    // percent = turn_power;
-    // read_color(percent, counts);
-
-    // counts = (CPI*2*pi*TR*19/36);
-    // percent = turn_power;
-    // turn_counterclockwise_center(percent, counts);
-
-    // counts = (CPI*13.625);
-    // percent = drive_power;
-    // move_forward(percent, counts);
-
-    // counts = (CPI*2*pi*TR/4);
-    // percent = -turn_power;
-    // turn_counterclockwise_center(percent, counts);
-
-    // counts = (CPI*40);
-    // percent = drive_power;
-    // move_forward(percent, counts);
-
-    // counts = (CPI*30);
-    // percent = drive_power;
-    // move_forward(percent, counts);
-
-
-
-
-
-
 
 }
