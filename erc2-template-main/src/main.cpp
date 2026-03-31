@@ -245,7 +245,7 @@ while((TimeNow() - time_start) <= 30)
 
 }
 
-void look_for_line (int percent, int counts)
+void look_for_line (int percent)
 {
  // Reset encoder counts
     right_encoder.ResetCounts();
@@ -296,13 +296,16 @@ void follow_line (int percent)
         left_motor.SetPercent(percent);
         }
 
+        //add cases for two seeing black where it makes a 90 degree turn
+        //in the given direction
 
-        // else if ((left_opto.Value() <= 4.8) && (center_opto.Value() <=4.8) && (right_opto.Value() <=4.8))
-        // {
-        // right_motor.Stop();
-        // left_motor.Stop();
-        // break;
-        // }
+        else if ((left_opto.Value() <= 4.8) && (center_opto.Value() <=4.8) && (right_opto.Value() <=4.8))
+        {
+        right_motor.Stop();
+        left_motor.Stop();
+        Sleep(0.5);
+        break;
+        }
 
 
        
@@ -312,15 +315,42 @@ void follow_line (int percent)
 
 }
 
+//these are used to control the speed of the servo arm so we don't break anything
+
+void lower_arm(int deg_from_180)
+{
+    int i = 0;
+    for(i=0; i<deg_from_180; i++){
+        arm_servo.SetDegree(180-i);
+        Sleep(0.01);
+    }
+
+}
+
+void raise_arm(int deg_from_90)
+{
+    int i = 0;
+    for(i=0; i<deg_from_90; i++){
+        arm_servo.SetDegree(90+i);
+        Sleep(0.01);
+    }
+
+}
+
 
 
 void ERCMain()
 {
 
   //counts/inch for 3" wheels : 33.74
+  //180 degree is vertical
+  //90 degree is horizontal
+
+
     int counts;
     int percent;
     int percent_R, percent_L;
+    int deg_from_180, deg_from_90;
 
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
@@ -336,6 +366,61 @@ void ERCMain()
     move_forward(percent, counts);
 
     Sleep(0.25);
+
+    //drive straight forward and look for line
+    percent = drive_power;
+    look_for_line(percent);
+
+    //follow line until turn
+    percent = turn_power;
+    follow_line(percent); //will break when none on black, AKA at 90 turn
+
+    //lower arm to interface with apple basket
+    //deg_from_180 = value;
+    //lower_arm(deg_from_180);
+
+    //raise arm slightly to let basket fall back
+    //deg_from_90 = value;
+    //raise_arm(deg_from_90);
+
+    //drive backwards to allow for turn
+    percent = turn_power;
+    //counts = (CPI*value); //small value to allow for turn
+    move_forward(percent, counts);
+
+    //90 degree turn
+    percent = turn_power;
+    counts = (TR*2*pi/4);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive forwards to get center behind ramp
+    percent = turn_power;
+    //counts = (CPI*value); //small value to align w ramp
+    move_forward(percent, counts);
+
+    //90 degree turn
+    percent = turn_power;
+    counts = (TR*2*pi/4);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive forward to be center aligned to climb ramp
+    percent = turn_power;
+    //counts = (CPI*value); //distance from last turn to ramp
+    move_forward(percent, counts);
+
+    //drive up ramp and look for line
+    percent = turn_power;
+    look_for_line(percent);
+
+    //follow line to crate
+    //add case for making the 90 degree turn when both center and right see black
+    //loop will break and stop when all sensors see white
+    percent = turn_power;
+    follow_line(percent);
+
+    //lower arm to deposit in crate
+    //deg_from_180 = value;
+    //lower_arm(deg_from_180);
 
 
 
