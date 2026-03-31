@@ -22,7 +22,7 @@ FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 AnalogInputPin CdS_cell(FEHIO::Pin3);
 FEHServo arm_servo(FEHServo::Servo0);
-AnalogInputPin left_opto(FEHIO::Pin5);
+AnalogInputPin left_opto(FEHIO::Pin4);
 AnalogInputPin center_opto(FEHIO::Pin6);
 AnalogInputPin right_opto(FEHIO::Pin7);
 
@@ -245,10 +245,30 @@ while((TimeNow() - time_start) <= 30)
 
 }
 
+void look_for_line (int percent, int counts)
+{
+ // Reset encoder counts
+    right_encoder.ResetCounts();
+    left_encoder.ResetCounts();
+
+    // Set both motors to desired percent
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent);
+
+    // While the optosensors see a color that isn't white,
+    // keep running motors
+    while((left_opto.Value() > 3) && (left_opto.Value() > 3) && (left_opto.Value() > 3));
+
+    // Turn off motors
+    right_motor.Stop();
+    left_motor.Stop();
+
+}
+
 
 void follow_line (int percent)
 {
-    float right_value, center_value, left_value;
+    // float right_value, center_value, left_value;
 
     while(true)
     {
@@ -258,19 +278,19 @@ void follow_line (int percent)
     // left_value = left_opto.Value();
 
 
-        if((right_opto.Value() >= 4.8))
+        if((right_opto.Value() >= 4))
         {
         right_motor.Stop();
         left_motor.SetPercent(percent);
         }
 
-        else if ((left_opto.Value() >= 4.8))
+        else if ((left_opto.Value() >= 4))
         {
         left_motor.Stop();
         right_motor.SetPercent(percent);
         }
 
-        else if(center_opto.Value() > 4.8)
+        else if(center_opto.Value() > 4)
         {
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
@@ -285,11 +305,7 @@ void follow_line (int percent)
         // }
 
 
-        LCD.Write(right_opto.Value());
-        LCD.Write(center_opto.Value());
-        LCD.Write(left_opto.Value());
-        LCD.Clear();
-
+       
 
     }
 
@@ -305,6 +321,17 @@ void ERCMain()
     int counts;
     int percent;
     int percent_R, percent_L;
+
+    // while(true){
+    //     LCD.Write(right_opto.Value());
+    //     LCD.Write(center_opto.Value());
+    //     LCD.Write(left_opto.Value());
+
+    //     Sleep(0.5);
+    //     LCD.Clear();
+
+        
+    // }
 
     percent = turn_power;
     follow_line(percent);
