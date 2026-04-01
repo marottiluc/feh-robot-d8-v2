@@ -20,7 +20,7 @@ DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
-AnalogInputPin CdS_cell(FEHIO::Pin3);
+AnalogInputPin CdS_cell(FEHIO::Pin2);
 FEHServo arm_servo(FEHServo::Servo0);
 AnalogInputPin left_opto(FEHIO::Pin4);
 AnalogInputPin center_opto(FEHIO::Pin6);
@@ -278,19 +278,19 @@ void follow_line (int percent)
     // left_value = left_opto.Value();
 
 
-        if((right_opto.Value() >= 4))
+        if((right_opto.Value() >= 3))
         {
         right_motor.Stop();
         left_motor.SetPercent(percent);
         }
 
-        else if ((left_opto.Value() >= 4))
+        else if ((left_opto.Value() >= 3))
         {
         left_motor.Stop();
         right_motor.SetPercent(percent);
         }
 
-        else if(center_opto.Value() > 4)
+        else if(center_opto.Value() > 3)
         {
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
@@ -299,7 +299,15 @@ void follow_line (int percent)
         //add cases for two seeing black where it makes a 90 degree turn
         //in the given direction
 
-        else if ((left_opto.Value() <= 4.8) && (center_opto.Value() <=4.8) && (right_opto.Value() <=4.8))
+        else if ((left_opto.Value() <= 3) && (center_opto.Value() <=3) && (right_opto.Value() <=3))
+        {
+        right_motor.Stop();
+        left_motor.Stop();
+        Sleep(0.5);
+        break;
+        }
+
+        else if (((left_opto.Value() > 3) && (center_opto.Value() > 3)) || ((right_opto.Value() > 3) && (center_opto.Value() > 3)))
         {
         right_motor.Stop();
         left_motor.Stop();
@@ -352,75 +360,80 @@ void ERCMain()
     int percent_R, percent_L;
     int deg_from_180, deg_from_90;
 
+    percent = turn_power;
+    follow_line(percent);
+
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
 
-    arm_servo.SetDegree(180.);
+    // arm_servo.SetDegree(180.);
+    // LCD.Write("servo");
 
-    //read start light
-    read_start();
+    // //read start light
+    // read_start();
+    // LCD.Write("cds");
 
     //back into start button
     counts = (CPI*1.5);
     percent = -drive_power/2;
     move_forward(percent, counts);
+    LCD.Write("motor");
 
     Sleep(0.25);
+     LCD.Write("sleep");
 
     //drive straight forward and look for line
     percent = drive_power;
-    look_for_line(percent);
+    counts = (CPI*9);
+    move_forward(percent, counts);
+     LCD.Write("drive");
+    // look_for_line(percent);
+
+    // //lower arm to interface with apple basket
+    // deg_from_180 = 70;
+    // lower_arm(deg_from_180);
 
     //follow line until turn
     percent = turn_power;
     follow_line(percent); //will break when none on black, AKA at 90 turn
 
-    //lower arm to interface with apple basket
-    //deg_from_180 = value;
-    //lower_arm(deg_from_180);
+    // //raise arm slightly to let basket fall back
+    // deg_from_90 = 70;
+    // raise_arm(deg_from_90);
 
-    //raise arm slightly to let basket fall back
-    //deg_from_90 = value;
-    //raise_arm(deg_from_90);
+    //go back the way it came
+    percent = -turn_power;
+    follow_line(percent);
 
-    //drive backwards to allow for turn
-    percent = turn_power;
-    //counts = (CPI*value); //small value to allow for turn
-    move_forward(percent, counts);
-
-    //90 degree turn
-    percent = turn_power;
-    counts = (TR*2*pi/4);
-    turn_counterclockwise_center(percent, counts);
-
-    //drive forwards to get center behind ramp
-    percent = turn_power;
-    //counts = (CPI*value); //small value to align w ramp
-    move_forward(percent, counts);
-
-    //90 degree turn
-    percent = turn_power;
-    counts = (TR*2*pi/4);
-    turn_counterclockwise_center(percent, counts);
-
-    //drive forward to be center aligned to climb ramp
-    percent = turn_power;
-    //counts = (CPI*value); //distance from last turn to ramp
-    move_forward(percent, counts);
+    //dirve to start, make the turn to align, go up ramp
 
     //drive up ramp and look for line
     percent = turn_power;
     look_for_line(percent);
 
     //follow line to crate
-    //add case for making the 90 degree turn when both center and right see black
-    //loop will break and stop when all sensors see white
+    //loop will break and stop when all sensors see white or it senses a turn
+    percent = turn_power;
+    follow_line(percent);
+
+    //90 degree turn CW
+    percent = -turn_power;
+    counts = (TR*2*pi/4);
+    turn_counterclockwise_center(percent, counts);
+
+    //follow line to crate
+    //loop will break and stop when all sensors see white or it senses a turn
     percent = turn_power;
     follow_line(percent);
 
     //lower arm to deposit in crate
-    //deg_from_180 = value;
-    //lower_arm(deg_from_180);
+    deg_from_180 = 110;
+    lower_arm(deg_from_180);
+
+    //drive back to release bucket
+    percent = -turn_power;
+    counts = (CPI*2);
+    move_forward(percent, counts);
 
 
 
