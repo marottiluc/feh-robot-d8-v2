@@ -64,10 +64,8 @@ void move_forward_var(int percent_R, int percent_L, int counts) //using encoders
     left_motor.Stop();
 }
 
-/*
- * Turn counterclockwise using shaft encoders where percent is the motor percent and counts is the distance to travel
- */
-void turn_counterclockwise_center(int percent, int counts)
+
+void turn_counterclockwise_center(int percent, int counts) //turn radius = TR = 3.5
 {
     // Reset encoder counts
     right_encoder.ResetCounts();
@@ -87,7 +85,7 @@ void turn_counterclockwise_center(int percent, int counts)
 }
 
 
-void turn_about_right(int percent, int counts)
+void turn_about_right(int percent, int counts) //turn radius = 2*TR = 7
 {
     // Reset encoder counts
     right_encoder.ResetCounts();
@@ -107,7 +105,7 @@ void turn_about_right(int percent, int counts)
 }
 
 
-void turn_about_left(int percent, int counts)
+void turn_about_left(int percent, int counts) //turn radius = 2*TR = 7
 {
     // Reset encoder counts
     right_encoder.ResetCounts();
@@ -128,7 +126,7 @@ void turn_about_left(int percent, int counts)
 
 
 
-void read_start ()
+void read_start () //times out after 30 seconds
 {
 // Initialize start time
 float value;
@@ -146,7 +144,7 @@ while((TimeNow() - time_start) <= 30)
 }
 }
 
-void blue_button(int percent, int counts)
+void blue_button(int percent, int counts) 
 {
     LCD.Clear();
     LCD.Write("BLUE");
@@ -215,14 +213,12 @@ void red_button(int percent, int counts)
 
 }
 
-void read_color(int percent, int counts)
+void read_color(int percent, int counts) //times out after 30 seconds
 {
 float value;
 float time_start = TimeNow();
 while((TimeNow() - time_start) <= 30)
 {
-
-    
     //read for color
     value = CdS_cell.Value();
     if(value <= 0.5){
@@ -241,12 +237,11 @@ while((TimeNow() - time_start) <= 30)
     Sleep(0.05);
 
 }
-
-
 }
 
-void look_for_line (int percent)
+void look_for_line (int percent) //times out after 30 seconds
 {
+    float time_start = TimeNow();
  // Reset encoder counts
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
@@ -255,14 +250,14 @@ void look_for_line (int percent)
     right_motor.SetPercent(percent);
     left_motor.SetPercent(percent);
 
-    // While the optosensors see a color that isn't white,
-    // keep running motors
-    while((left_opto.Value() > 3) && (left_opto.Value() > 3) && (left_opto.Value() > 3));
+    // While the optosensors see a color that isn't white, keep running motors
+    while((left_opto.Value() > 3) && (left_opto.Value() > 3) && (left_opto.Value() > 3) && ((TimeNow() - time_start) <= 30));
 
     // Turn off motors
     right_motor.Stop();
     left_motor.Stop();
 
+    
 }
 
 
@@ -360,110 +355,210 @@ void follow_line_counts (int percent, int counts)
 
 }
 
+//protocol for navigating to the left lever
+void left_lever()
+{
+
+
+}
+
+//protocol for navigating to the center lever
+void center_lever()
+{
+
+}
+
+//protocol for navigating to the right lever
+void right_lever()
+{
+
+}
+
+//decision program for navigating to levers
+void choose_lever()
+{
+    int lever_choice = RCS.GetLever();
+
+    if(lever_choice == 0)
+    {
+        left_lever();
+    }
+
+    else if(lever_choice == 1)
+    {
+        center_lever();
+    }
+
+    else if(lever_choice == 2)
+    {
+        right_lever();
+    }
+
+}
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 void ERCMain()
 {
-  //counts/inch for 3" wheels : 33.74
-  //180 degree is vertical
-  //90 degree is horizontal
+//   //counts/inch for 3" wheels : 33.74
+//   //180 degree is vertical
+//   //90 degree is horizontal
 
 
-    int counts;
-    int percent;
-    int percent_R, percent_L;
-    int deg_from_180, deg_from_90;
+//     int counts;
+//     int percent;
+//     int percent_R, percent_L;
 
-    arm_servo.SetMin(servo_min);
-    arm_servo.SetMax(servo_max);
+//     arm_servo.SetMin(servo_min);
+//     arm_servo.SetMax(servo_max);
 
 
-    // arm_servo.SetDegree(0);
-    // LCD.Write("servo");
+//     // arm_servo.SetDegree(0);
+//     // LCD.Write("servo");
 
-    // //read start light
-    // read_start();
-    // LCD.Write("cds");
+//     // //read start light
+//     // read_start();
+//     // LCD.Write("cds");
 
-    //back into start button
-    counts = (CPI*0.75);
-    percent = -drive_power/2;
-    move_forward(percent, counts);
-    LCD.Write("motor");
+//     //back into start button
+//     counts = (CPI*0.75); //should be 1.5
+//     percent = -drive_power/2;
+//     move_forward(percent, counts);
+//     LCD.Write("motor");
 
-    Sleep(0.25);
-    LCD.Write("sleep");
+//     Sleep(0.25);
+//     LCD.Write("sleep");
 
-    //drive straight forward and look for line
-    percent = turn_power;
-    counts = (CPI*5);
-    move_forward(percent, counts);
-     LCD.Write("drive");
-    // look_for_line(percent);
+//     //drive straight forward and look for line
+//     percent = turn_power;
+//     counts = (CPI*5); //should be 9
+//     move_forward(percent, counts);
+//      LCD.Write("drive");
+//     // look_for_line(percent);
 
-    //lower arm to interface w basket
-    int i = 0;
-    for(i=0; i<50; i++){
-        arm_servo.SetDegree(0+i);
-        Sleep(0.01);
-    }
+//     //lower arm to interface w basket
+//     int i = 0;
+//     for(i=0; i<50; i++){
+//         arm_servo.SetDegree(0+i);
+//         Sleep(0.01);
+//     }
 
-    //follow line until turn
-    percent = turn_power;
-    counts = (CPI*6);
-    follow_line(percent); //will break when none on black, AKA at 90 turn
+//     //follow line until turn
+//     percent = turn_power;
+//     counts = (CPI*6); //should be 10 if using counts
+//     follow_line(percent); //will break when none on black, AKA at 90 turn
+//     //follow_line_counts(percent, counts);
 
-    //turn to align
-    percent = -turn_power/2;
-    counts = (CPI*0.5);
-    turn_about_right(percent, counts);
+//     //turn to align
+//     percent = -turn_power/2;
+//     counts = (CPI*0.5);
+//     turn_about_right(percent, counts);
 
-    //drive into basket to grab
-    percent = turn_power;
-    counts = (CPI*3);
-    move_forward(percent, counts);
-    Sleep(1.0);
+//     //drive into basket to grab
+//     percent = turn_power;
+//     counts = (CPI*3);
+//     move_forward(percent, counts);
+//     Sleep(1.0);
 
-    //raise arm 15 degrees
-    for(i; i>35; i--){
-        arm_servo.SetDegree(0+i);
-        Sleep(0.01);
-    }
+//     //raise arm 15 degrees
+//     for(i; i>35; i--){
+//         arm_servo.SetDegree(0+i);
+//         Sleep(0.01);
+//     }
 
-    //go back the way it came
-    percent = -turn_power;
-    counts = (CPI*2);
-    move_forward(percent, counts);
-    follow_line(percent);
+//     //go back the way it came and follow line out
+//     percent = -turn_power;
+//     counts = (CPI*2);
+//     move_forward(percent, counts);
+//     follow_line(percent);
 
-    // //dirve to start, make the turn to align, go up ramp
+//      //return to starting position
+//     percent = turn_power;
+//     counts = (CPI*5); //should be 9
+//     move_forward(percent, counts);
 
-    // //drive up ramp and look for line
-    // percent = turn_power;
-    // look_for_line(percent);
+//     //turn to align w ramp
+//     counts = (CPI*2*pi*2*TR/8);
+//     percent = turn_power;
+//     turn_about_right(percent, counts);
 
-    // //follow line to crate
-    // //loop will break and stop when all sensors see white or it senses a turn
-    // percent = turn_power;
-    // follow_line(percent);
+//     //drive up ramp and catch line
+//     counts = (CPI*28);
+//     percent = turn_power;
+//     move_forward(percent, counts);
 
-    // //90 degree turn CW
-    // percent = -turn_power;
-    // counts = (TR*2*pi/4);
-    // turn_counterclockwise_center(percent, counts);
+//     /////////////////////
+//     /////UPPER LEVEL/////
+//     /////////////////////
 
-    // //follow line to crate
-    // //loop will break and stop when all sensors see white or it senses a turn
-    // percent = turn_power;
-    // follow_line(percent);
+//     //follow along line until 90 degree turn
+//     percent = turn_power;
+//     counts = (CPI*9);
+//     follow_line_counts(percent, counts);
 
-    // //lower arm to deposit in crate
-    // deg_from_180 = 110;
-    // lower_arm(deg_from_180);
+//     //make manual 45 degree turn
+//     percent = turn_power;
+//     counts = (TR*2*pi/8);
+//     turn_counterclockwise_center(percent, counts);
 
-    // //drive back to release bucket
-    // percent = -turn_power;
-    // counts = (CPI*2);
-    // move_forward(percent, counts);
+//     //drive forward to try and catch line
+//     percent = turn_power;
+//     look_for_line(percent);
+
+//     //follow line to apple crate
+//     percent = turn_power;
+//     follow_line(percent);
+
+//     //align on crate
+//     percent = turn_power; 
+//     counts = (CPI*2);
+//     move_forward(percent, counts);
+
+//     percent = -turn_power; //back out slightly so basket does not hit back of crate
+//     counts = (CPI*0.25);
+//     move_forward(percent, counts);
+
+//     //lower basket into crate (down 30 degrees, get to 65 degrees)
+//     for(i; i<65; i++){
+//         arm_servo.SetDegree(0+i);
+//         Sleep(0.01);
+//     }
+
+//     //back arm out of basket
+//     percent = -turn_power;
+//     counts = (CPI*3);
+//     move_forward(percent, counts);
+
+//     //raise arm back up to top
+//     for(i; i>0; i--){
+//         arm_servo.SetDegree(0+i);
+//         Sleep(0.01);
+//     }
+
+//     //follow line backwards to turn junction
+//     percent = -turn_power;
+//     follow_line(percent);
+
+//     ////////////////////////
+//     ////STARTING LEVERS/////
+//     ///////////////////////
+
+//     //make 45 degree turn to face levers
+//     percent = turn_power;
+//     counts = (CPI*TR*2*pi/8);
+//     turn_counterclockwise_center(percent, counts);
+
+//     //get info from course and navigate to lever
+//     choose_lever();
+
+
+
+
+
 
 
 
@@ -488,23 +583,25 @@ void ERCMain()
 //encoder testing loop
     while(true)
     {
+        int percent, counts;
+
         percent = turn_power;
-        counts = (2*TR*2*pi);
+        counts = (CPI*2*TR*2*pi);
         turn_about_left(percent, counts);
         Sleep(2.0);
 
         percent = turn_power;
-        counts = (2*TR*2*pi);
+        counts = (CPI*2*TR*2*pi);
         turn_about_right(percent, counts);
         Sleep(2.0);
 
         percent = turn_power;
-        counts = (TR*2*pi);
+        counts = (CPI*TR*2*pi);
         turn_counterclockwise_center(percent, counts);
         Sleep(2.0);
 
         percent = -turn_power;
-        counts = (TR*2*pi);
+        counts = (CPI*TR*2*pi);
         turn_counterclockwise_center(percent, counts);
         Sleep(2.0);
 
