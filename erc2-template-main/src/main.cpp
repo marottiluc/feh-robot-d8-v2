@@ -360,34 +360,9 @@ void follow_line_counts (int percent, int counts)
 
 }
 
-//these are used to control the speed of the servo arm so we don't break anything
-
-void lower_arm(int deg_from_180)
-{
-    int i = 0;
-    for(i=0; i<deg_from_180; i++){
-        arm_servo.SetDegree(180-i);
-        Sleep(0.01);
-    }
-
-}
-
-void raise_arm(int deg_from_90)
-{
-    int i = 0;
-    for(i=0; i<deg_from_90; i++){
-        arm_servo.SetDegree(90+i);
-        Sleep(0.01);
-    }
-
-}
-
-
 
 void ERCMain()
 {
-
-
   //counts/inch for 3" wheels : 33.74
   //180 degree is vertical
   //90 degree is horizontal
@@ -425,10 +400,12 @@ void ERCMain()
      LCD.Write("drive");
     // look_for_line(percent);
 
-    //lower arm to interface with apple basket
-    // deg_from_180 = 20;
-    // lower_arm(deg_from_180);
-    arm_servo.SetDegree(50);
+    //lower arm to interface w basket
+    int i = 0;
+    for(i=0; i<50; i++){
+        arm_servo.SetDegree(0+i);
+        Sleep(0.01);
+    }
 
     //follow line until turn
     percent = turn_power;
@@ -446,11 +423,11 @@ void ERCMain()
     move_forward(percent, counts);
     Sleep(1.0);
 
-    //raise arm slightly to let basket fall back
-    // deg_from_90 = 70;
-    // raise_arm(deg_from_90);
-    arm_servo.SetDegree(35);
-    Sleep(1.0);
+    //raise arm 15 degrees
+    for(i; i>35; i--){
+        arm_servo.SetDegree(0+i);
+        Sleep(0.01);
+    }
 
     //go back the way it came
     percent = -turn_power;
@@ -506,5 +483,42 @@ void ERCMain()
 
     // percent = turn_power;
     // follow_line(percent);
+
+
+//encoder testing loop
+    while(true)
+    {
+        percent = turn_power;
+        counts = (2*TR*2*pi);
+        turn_about_left(percent, counts);
+        Sleep(2.0);
+
+        percent = turn_power;
+        counts = (2*TR*2*pi);
+        turn_about_right(percent, counts);
+        Sleep(2.0);
+
+        percent = turn_power;
+        counts = (TR*2*pi);
+        turn_counterclockwise_center(percent, counts);
+        Sleep(2.0);
+
+        percent = -turn_power;
+        counts = (TR*2*pi);
+        turn_counterclockwise_center(percent, counts);
+        Sleep(2.0);
+
+        percent = turn_power;
+        counts = (CPI*6);
+        move_forward(percent, counts);
+        Sleep(2.0);
+
+        percent = -turn_power;
+        counts = (CPI*6);
+        move_forward(percent, counts);
+        Sleep(2.0);
+
+
+    }
 
 }
