@@ -11,8 +11,8 @@
 #define pi 3.14159
 #define turn_power -25
 #define drive_power -40
-#define servo_min 1322
-#define servo_max 2279
+#define servo_min 500
+#define servo_max 1561
 
 //Declarations for encoders & motors
 //left and right as view from the front 
@@ -278,19 +278,19 @@ void follow_line (int percent)
     // left_value = left_opto.Value();
 
 
-        if((right_opto.Value() >= 3))
+        if((right_opto.Value() >= 3.5))
         {
         right_motor.Stop();
         left_motor.SetPercent(percent);
         }
 
-        else if ((left_opto.Value() >= 3))
+        else if ((left_opto.Value() >= 3.5))
         {
         left_motor.Stop();
         right_motor.SetPercent(percent);
         }
 
-        else if(center_opto.Value() > 3)
+        else if(center_opto.Value() > 3.5)
         {
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
@@ -304,19 +304,56 @@ void follow_line (int percent)
         right_motor.Stop();
         left_motor.Stop();
         Sleep(0.5);
+        LCD.Write("STOP: All White");
         break;
         }
 
-        else if (((left_opto.Value() > 3) && (center_opto.Value() > 3)) || ((right_opto.Value() > 3) && (center_opto.Value() > 3)))
+        else if (((left_opto.Value() > 4.5) && (center_opto.Value() > 4.5)) || ((right_opto.Value() > 4.5) && (center_opto.Value() > 4.5)))
         {
         right_motor.Stop();
         left_motor.Stop();
         Sleep(0.5);
+        LCD.Write("STOP: Expected Turn");
         break;
         }
 
+        // LCD.Write(right_opto.Value());
+        // LCD.Write(center_opto.Value());
+        // LCD.Write(left_opto.Value());
+
+        // Sleep(0.5);
+        // LCD.Clear();
+
+
 
        
+
+    }
+
+
+}
+
+void follow_line_counts (int percent, int counts)
+{
+    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
+    {
+        if((right_opto.Value() >= 3.5))
+        {
+        right_motor.Stop();
+        left_motor.SetPercent(percent);
+        }
+
+        else if ((left_opto.Value() >= 3.5))
+        {
+        left_motor.Stop();
+        right_motor.SetPercent(percent);
+        }
+
+        else if(center_opto.Value() > 3.5)
+        {
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(percent);
+        }
 
     }
 
@@ -350,6 +387,7 @@ void raise_arm(int deg_from_90)
 void ERCMain()
 {
 
+
   //counts/inch for 3" wheels : 33.74
   //180 degree is vertical
   //90 degree is horizontal
@@ -360,13 +398,11 @@ void ERCMain()
     int percent_R, percent_L;
     int deg_from_180, deg_from_90;
 
-    percent = turn_power;
-    follow_line(percent);
-
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
 
-    // arm_servo.SetDegree(180.);
+
+    // arm_servo.SetDegree(0);
     // LCD.Write("servo");
 
     // //read start light
@@ -374,66 +410,83 @@ void ERCMain()
     // LCD.Write("cds");
 
     //back into start button
-    counts = (CPI*1.5);
+    counts = (CPI*0.75);
     percent = -drive_power/2;
     move_forward(percent, counts);
     LCD.Write("motor");
 
     Sleep(0.25);
-     LCD.Write("sleep");
+    LCD.Write("sleep");
 
     //drive straight forward and look for line
-    percent = drive_power;
-    counts = (CPI*9);
+    percent = turn_power;
+    counts = (CPI*5);
     move_forward(percent, counts);
      LCD.Write("drive");
     // look_for_line(percent);
 
-    // //lower arm to interface with apple basket
-    // deg_from_180 = 70;
+    //lower arm to interface with apple basket
+    // deg_from_180 = 20;
     // lower_arm(deg_from_180);
+    arm_servo.SetDegree(50);
 
     //follow line until turn
     percent = turn_power;
+    counts = (CPI*6);
     follow_line(percent); //will break when none on black, AKA at 90 turn
 
-    // //raise arm slightly to let basket fall back
+    //turn to align
+    percent = -turn_power/2;
+    counts = (CPI*0.5);
+    turn_about_right(percent, counts);
+
+    //drive into basket to grab
+    percent = turn_power;
+    counts = (CPI*3);
+    move_forward(percent, counts);
+    Sleep(1.0);
+
+    //raise arm slightly to let basket fall back
     // deg_from_90 = 70;
     // raise_arm(deg_from_90);
+    arm_servo.SetDegree(35);
+    Sleep(1.0);
 
     //go back the way it came
     percent = -turn_power;
-    follow_line(percent);
-
-    //dirve to start, make the turn to align, go up ramp
-
-    //drive up ramp and look for line
-    percent = turn_power;
-    look_for_line(percent);
-
-    //follow line to crate
-    //loop will break and stop when all sensors see white or it senses a turn
-    percent = turn_power;
-    follow_line(percent);
-
-    //90 degree turn CW
-    percent = -turn_power;
-    counts = (TR*2*pi/4);
-    turn_counterclockwise_center(percent, counts);
-
-    //follow line to crate
-    //loop will break and stop when all sensors see white or it senses a turn
-    percent = turn_power;
-    follow_line(percent);
-
-    //lower arm to deposit in crate
-    deg_from_180 = 110;
-    lower_arm(deg_from_180);
-
-    //drive back to release bucket
-    percent = -turn_power;
     counts = (CPI*2);
     move_forward(percent, counts);
+    follow_line(percent);
+
+    // //dirve to start, make the turn to align, go up ramp
+
+    // //drive up ramp and look for line
+    // percent = turn_power;
+    // look_for_line(percent);
+
+    // //follow line to crate
+    // //loop will break and stop when all sensors see white or it senses a turn
+    // percent = turn_power;
+    // follow_line(percent);
+
+    // //90 degree turn CW
+    // percent = -turn_power;
+    // counts = (TR*2*pi/4);
+    // turn_counterclockwise_center(percent, counts);
+
+    // //follow line to crate
+    // //loop will break and stop when all sensors see white or it senses a turn
+    // percent = turn_power;
+    // follow_line(percent);
+
+    // //lower arm to deposit in crate
+    // deg_from_180 = 110;
+    // lower_arm(deg_from_180);
+
+    // //drive back to release bucket
+    // percent = -turn_power;
+    // counts = (CPI*2);
+    // move_forward(percent, counts);
 
 
 
