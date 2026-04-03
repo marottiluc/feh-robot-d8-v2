@@ -273,19 +273,19 @@ void follow_line (int percent)
     // left_value = left_opto.Value();
 
 
-        if((right_opto.Value() >= 3.5))
+        if((right_opto.Value() >= 3))
         {
         right_motor.Stop();
         left_motor.SetPercent(percent);
         }
 
-        else if ((left_opto.Value() >= 3.5))
+        else if ((left_opto.Value() >= 3))
         {
         left_motor.Stop();
         right_motor.SetPercent(percent);
         }
 
-        else if(center_opto.Value() > 3.5)
+        else if(center_opto.Value() > 3)
         {
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
@@ -332,19 +332,19 @@ void follow_line_counts (int percent, int counts)
 {
     while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
     {
-        if((right_opto.Value() >= 3.5))
+        if((right_opto.Value() >= 3))
         {
         right_motor.Stop();
         left_motor.SetPercent(percent);
         }
 
-        else if ((left_opto.Value() >= 3.5))
+        else if ((left_opto.Value() >= 3))
         {
         left_motor.Stop();
         right_motor.SetPercent(percent);
         }
 
-        else if(center_opto.Value() > 3.5)
+        else if(center_opto.Value() > 3)
         {
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
@@ -416,34 +416,21 @@ void ERCMain()
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
 
+    arm_servo.SetDegree(0);
+    LCD.Write("servo");
 
-    //servo testing protocols
-    while(true)
-    {
-        arm_servo.SetDegree(0);
-        Sleep(1.0);
+    
+    // // testing protocols for optosensors
+    //    while(true){
+    //     LCD.Write(right_opto.Value());
+    //     LCD.Write(center_opto.Value());
+    //     LCD.Write(left_opto.Value());
 
-        arm_servo.SetDegree(15);
-        Sleep(1.0);
+    //     Sleep(0.5);
+    //     LCD.Clear();
 
-        arm_servo.SetDegree(30);
-        Sleep(1.0);
-
-        arm_servo.SetDegree(45);
-        Sleep(1.0);
-
-        arm_servo.SetDegree(60);
-        Sleep(1.0);
-
-        arm_servo.SetDegree(75);
-        Sleep(1.0);
-
-        arm_servo.SetDegree(90);
-        Sleep(1.0);
-
-    }
-    // arm_servo.SetDegree(0);
-    // LCD.Write("servo");
+        
+    // }
 
     // //read start light
     // read_start();
@@ -463,50 +450,62 @@ void ERCMain()
     counts = (CPI*9);
     move_forward(percent, counts);
      LCD.Write("drive");
+     Sleep(1.5);
     // look_for_line(percent);
 
     //lower arm to interface w basket
     int i = 0;
     for(i=0; i<50; i++){
-        arm_servo.SetDegree(0+i);
+        arm_servo.SetDegree(i);
         Sleep(0.01);
     }
-    Sleep(2.0);
+     LCD.Write("arm down");
+     Sleep(1.5);
 
     //follow line until turn
-    percent = turn_power;
+    percent = turn_power-10;
     counts = (CPI*10); 
     follow_line(percent); //will break when none on black, AKA at 90 turn
+     LCD.Write("follow");
+     Sleep(1.5);
     //follow_line_counts(percent, counts);
 
     //turn to align
-    percent = -turn_power/2;
+    percent = -turn_power;
     counts = (CPI*0.5);
     turn_about_right(percent, counts);
+     LCD.Write("align");
+     Sleep(1.5);
 
     //drive into basket to grab
     percent = turn_power;
     counts = (CPI*3);
     move_forward(percent, counts);
+     LCD.Write("grab basket");
     Sleep(1.0);
 
     //raise arm 15 degrees
     for(i; i>20; i--){
-        arm_servo.SetDegree(0+i);
+        arm_servo.SetDegree(i);
         Sleep(0.01);
     }
-     Sleep(2.0);
+     LCD.Write("raise arm");
+     Sleep(1.5);
 
     //go back the way it came and follow line out
-    percent = -turn_power;
-    counts = (CPI*2);
+    percent = -drive_power;
+    counts = (CPI*8);
     move_forward(percent, counts);
     follow_line(percent);
+     LCD.Write("return");
+     Sleep(1.5);
 
      //return to starting position
-    percent = turn_power;
+    percent = -turn_power;
     counts = (CPI*9);
     move_forward(percent, counts);
+    LCD.Write("home");
+    Sleep(1.5);
 
     //turn to align w ramp
     counts = (CPI*2*pi*2*TR/8);
@@ -551,22 +550,20 @@ void ERCMain()
 
     //lower basket into crate (down 30 degrees, get to 80 degrees)
     for(i; i<80; i++){
-        arm_servo.SetDegree(0+i);
+        arm_servo.SetDegree(i);
         Sleep(0.01);
     }
-     Sleep(2.0);
 
-//     //back arm out of basket
-//     percent = -turn_power;
-//     counts = (CPI*3);
-//     move_forward(percent, counts);
+    //back arm out of basket
+    percent = -turn_power;
+    counts = (CPI*3);
+    move_forward(percent, counts);
 
     //raise arm back up to top
     for(i; i>0; i--){
-        arm_servo.SetDegree(0+i);
+        arm_servo.SetDegree(i);
         Sleep(0.01);
     }
-     Sleep(2.0);
 
     //follow line backwards to turn junction
     percent = -turn_power;
@@ -584,7 +581,37 @@ void ERCMain()
     //get info from course and navigate to lever
     choose_lever();
 
-    
+    // //once the lever is approached, lower the arm to flick the lever down
+    // for(i; i<60; i++){
+    //     arm_servo.SetDegree(i);
+    //     Sleep(0.025);
+    // }
+    // Sleep(1.0);
+
+    // //drive back
+    // percent = -turn_power;
+    // counts = (CPI*3);
+    // move_forward(percent, counts);
+
+    // //lower servo and wait
+    // for(i; i<90; i++){
+    //     arm_servo.SetDegree(i);
+    //     Sleep(0.01);
+    // }
+    // Sleep(5.0);
+
+    // //drive forward
+    // percent = turn_power;
+    // counts = (CPI*3);
+    // move_forward(percent, counts);
+
+    // //lift arm back up
+    // for(i; i>45; i--){
+    //     arm_servo.SetDegree(i);
+    //     Sleep(0.025);
+    // }
+
+
 
 
 
@@ -606,9 +633,6 @@ void ERCMain()
 
         
     // }
-
-    // percent = turn_power;
-    // follow_line(percent);
 
 
 
