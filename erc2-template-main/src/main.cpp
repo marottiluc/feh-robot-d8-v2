@@ -536,11 +536,28 @@ void ERCMain()
 
     //lower arm to interface w basket
     int i = 0;
-    for(i=0; i<50; i++){
+    for(i=0; i<55; i++){
         arm_servo.SetDegree(i);
         Sleep(0.01);
     }
      LCD.Write("arm down");
+
+     //45 degree about right
+     percent = turn_power;
+     counts = (CPI*2*pi*2*TR/8);
+     turn_about_right(percent, counts);
+     LCD.Write("45 deg");
+
+     //90 degrees about left
+     percent = turn_power;
+     counts = (CPI*2*pi*2*TR/4);
+     turn_about_left(percent, counts);
+     LCD.Write("90 deg");
+
+     //backwards to align
+     percent = -turn_power;
+     counts = (CPI*4);
+     move_forward(percent, counts);
 
     //follow line until turn
     percent = turn_power+5;
@@ -549,15 +566,9 @@ void ERCMain()
      LCD.Write("follow");
     //follow_line_counts(percent, counts);
 
-    //turn to align
-    percent = -turn_power;
-    counts = (CPI*1.5);
-    turn_about_right(percent, counts);
-     LCD.Write("align");
-
     //drive into basket to grab
     percent = turn_power;
-    counts = (CPI*3);
+    counts = (CPI*0.5);
     move_forward(percent, counts);
      LCD.Write("grab basket");
     Sleep(1.0);
@@ -570,28 +581,41 @@ void ERCMain()
      LCD.Write("raise arm");
      Sleep(1.5);
 
-    //go back the way it came and follow line out
-    percent = -turn_power/2;
-    counts = (CPI*8);
-    move_forward(percent, counts);
-    follow_line(percent);
-     LCD.Write("return");
-     Sleep(1.5);
+    //45 degree about left (backwards)
+     percent = -turn_power;
+     counts = (CPI*2*pi*2*TR/8);
+     turn_about_left(percent, counts);
+     LCD.Write("45 deg");
 
-     //return to starting position
-    percent = -turn_power;
-    counts = (CPI*9);
-    move_forward(percent, counts);
-    LCD.Write("home");
-    Sleep(1.5);
+     //backwards for spacing
+     percent = -turn_power;
+     counts = (CPI*1);
+     move_forward(percent, counts);
+    
+     //45 degree about right (backwards)
+     percent = -turn_power;
+     counts = (CPI*2*pi*2*TR/8);
+     turn_about_right(percent, counts);
+     LCD.Write("45 deg");
 
-    //turn to align w ramp
-    counts = (CPI*2*pi*2*TR/8);
-    percent = turn_power;
-    turn_about_right(percent, counts);
+     //backwards to hit wall
+     percent = -turn_power;
+     counts = (CPI*20);
+     move_forward(percent, counts);
+
+     //forwards for ramp
+     percent = turn_power;
+     counts = (CPI*1);
+     move_forward(percent, counts);
+
+     //90 degrees about right
+     percent = turn_power;
+     counts = (CPI*2*pi*2*TR/4);
+     turn_about_right(percent, counts);
+     LCD.Write("90 deg");
 
     //drive up ramp and catch line
-    counts = (CPI*28);
+    counts = (CPI*12);
     percent = turn_power;
     move_forward(percent, counts);
 
@@ -604,14 +628,17 @@ void ERCMain()
     counts = (CPI*9);
     follow_line_counts(percent, counts);
 
-    //make manual 45 degree turn
+    //90 about left and 90 about right
+
+    // XXXXX make manual 45 degree turn XXXXX
     percent = turn_power;
     counts = (TR*2*pi/8);
     turn_counterclockwise_center(percent, counts);
 
-    //drive forward to try and catch line
+    //drive forward to try and catch line 
     percent = turn_power;
     look_for_line(percent);
+    //change to shaft encode then regular follow function
 
     //follow line to apple crate
     percent = turn_power;
@@ -646,6 +673,7 @@ void ERCMain()
     //follow line backwards to turn junction
     percent = -turn_power;
     follow_line(percent);
+    //change to shaft encode
 
     ////////////////////////
     ////STARTING LEVERS/////
