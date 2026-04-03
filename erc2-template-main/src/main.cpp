@@ -404,156 +404,187 @@ void choose_lever()
 
 void ERCMain()
 {
-//   //counts/inch for 3" wheels : 33.74
-//   //180 degree is vertical
-//   //90 degree is horizontal
+  //counts/inch for 3" wheels : 33.74
+  //180 degree is vertical
+  //90 degree is horizontal
 
 
-//     int counts;
-//     int percent;
-//     int percent_R, percent_L;
+    int counts;
+    int percent;
+    int percent_R, percent_L;
 
-//     arm_servo.SetMin(servo_min);
-//     arm_servo.SetMax(servo_max);
+    arm_servo.SetMin(servo_min);
+    arm_servo.SetMax(servo_max);
 
 
-//     // arm_servo.SetDegree(0);
-//     // LCD.Write("servo");
+    //servo testing protocols
+    while(true)
+    {
+        arm_servo.SetDegree(0);
+        Sleep(1.0);
 
-//     // //read start light
-//     // read_start();
-//     // LCD.Write("cds");
+        arm_servo.SetDegree(15);
+        Sleep(1.0);
 
-//     //back into start button
-//     counts = (CPI*0.75); //should be 1.5
-//     percent = -drive_power/2;
-//     move_forward(percent, counts);
-//     LCD.Write("motor");
+        arm_servo.SetDegree(30);
+        Sleep(1.0);
 
-//     Sleep(0.25);
-//     LCD.Write("sleep");
+        arm_servo.SetDegree(45);
+        Sleep(1.0);
 
-//     //drive straight forward and look for line
-//     percent = turn_power;
-//     counts = (CPI*5); //should be 9
-//     move_forward(percent, counts);
-//      LCD.Write("drive");
-//     // look_for_line(percent);
+        arm_servo.SetDegree(60);
+        Sleep(1.0);
 
-//     //lower arm to interface w basket
-//     int i = 0;
-//     for(i=0; i<50; i++){
-//         arm_servo.SetDegree(0+i);
-//         Sleep(0.01);
-//     }
+        arm_servo.SetDegree(75);
+        Sleep(1.0);
 
-//     //follow line until turn
-//     percent = turn_power;
-//     counts = (CPI*6); //should be 10 if using counts
-//     follow_line(percent); //will break when none on black, AKA at 90 turn
-//     //follow_line_counts(percent, counts);
+        arm_servo.SetDegree(90);
+        Sleep(1.0);
 
-//     //turn to align
-//     percent = -turn_power/2;
-//     counts = (CPI*0.5);
-//     turn_about_right(percent, counts);
+    }
+    // arm_servo.SetDegree(0);
+    // LCD.Write("servo");
 
-//     //drive into basket to grab
-//     percent = turn_power;
-//     counts = (CPI*3);
-//     move_forward(percent, counts);
-//     Sleep(1.0);
+    // //read start light
+    // read_start();
+    // LCD.Write("cds");
 
-//     //raise arm 15 degrees
-//     for(i; i>35; i--){
-//         arm_servo.SetDegree(0+i);
-//         Sleep(0.01);
-//     }
+    //back into start button
+    counts = (CPI*1.5);
+    percent = -drive_power/2;
+    move_forward(percent, counts);
+    LCD.Write("motor");
 
-//     //go back the way it came and follow line out
-//     percent = -turn_power;
-//     counts = (CPI*2);
-//     move_forward(percent, counts);
-//     follow_line(percent);
+    Sleep(0.25);
+    LCD.Write("sleep");
 
-//      //return to starting position
-//     percent = turn_power;
-//     counts = (CPI*5); //should be 9
-//     move_forward(percent, counts);
+    //drive straight forward and look for line
+    percent = turn_power;
+    counts = (CPI*9);
+    move_forward(percent, counts);
+     LCD.Write("drive");
+    // look_for_line(percent);
 
-//     //turn to align w ramp
-//     counts = (CPI*2*pi*2*TR/8);
-//     percent = turn_power;
-//     turn_about_right(percent, counts);
+    //lower arm to interface w basket
+    int i = 0;
+    for(i=0; i<50; i++){
+        arm_servo.SetDegree(0+i);
+        Sleep(0.01);
+    }
+    Sleep(2.0);
 
-//     //drive up ramp and catch line
-//     counts = (CPI*28);
-//     percent = turn_power;
-//     move_forward(percent, counts);
+    //follow line until turn
+    percent = turn_power;
+    counts = (CPI*10); 
+    follow_line(percent); //will break when none on black, AKA at 90 turn
+    //follow_line_counts(percent, counts);
 
-//     /////////////////////
-//     /////UPPER LEVEL/////
-//     /////////////////////
+    //turn to align
+    percent = -turn_power/2;
+    counts = (CPI*0.5);
+    turn_about_right(percent, counts);
 
-//     //follow along line until 90 degree turn
-//     percent = turn_power;
-//     counts = (CPI*9);
-//     follow_line_counts(percent, counts);
+    //drive into basket to grab
+    percent = turn_power;
+    counts = (CPI*3);
+    move_forward(percent, counts);
+    Sleep(1.0);
 
-//     //make manual 45 degree turn
-//     percent = turn_power;
-//     counts = (TR*2*pi/8);
-//     turn_counterclockwise_center(percent, counts);
+    //raise arm 15 degrees
+    for(i; i>20; i--){
+        arm_servo.SetDegree(0+i);
+        Sleep(0.01);
+    }
+     Sleep(2.0);
 
-//     //drive forward to try and catch line
-//     percent = turn_power;
-//     look_for_line(percent);
+    //go back the way it came and follow line out
+    percent = -turn_power;
+    counts = (CPI*2);
+    move_forward(percent, counts);
+    follow_line(percent);
 
-//     //follow line to apple crate
-//     percent = turn_power;
-//     follow_line(percent);
+     //return to starting position
+    percent = turn_power;
+    counts = (CPI*9);
+    move_forward(percent, counts);
 
-//     //align on crate
-//     percent = turn_power; 
-//     counts = (CPI*2);
-//     move_forward(percent, counts);
+    //turn to align w ramp
+    counts = (CPI*2*pi*2*TR/8);
+    percent = turn_power;
+    turn_about_right(percent, counts);
 
-//     percent = -turn_power; //back out slightly so basket does not hit back of crate
-//     counts = (CPI*0.25);
-//     move_forward(percent, counts);
+    //drive up ramp and catch line
+    counts = (CPI*28);
+    percent = turn_power;
+    move_forward(percent, counts);
 
-//     //lower basket into crate (down 30 degrees, get to 65 degrees)
-//     for(i; i<65; i++){
-//         arm_servo.SetDegree(0+i);
-//         Sleep(0.01);
-//     }
+    /////////////////////
+    /////UPPER LEVEL/////
+    /////////////////////
+
+    //follow along line until 90 degree turn
+    percent = turn_power;
+    counts = (CPI*9);
+    follow_line_counts(percent, counts);
+
+    //make manual 45 degree turn
+    percent = turn_power;
+    counts = (TR*2*pi/8);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive forward to try and catch line
+    percent = turn_power;
+    look_for_line(percent);
+
+    //follow line to apple crate
+    percent = turn_power;
+    follow_line(percent);
+
+    //align on crate
+    percent = turn_power; 
+    counts = (CPI*2);
+    move_forward(percent, counts);
+
+    percent = -turn_power; //back out slightly so basket does not hit back of crate
+    counts = (CPI*0.25);
+    move_forward(percent, counts);
+
+    //lower basket into crate (down 30 degrees, get to 80 degrees)
+    for(i; i<80; i++){
+        arm_servo.SetDegree(0+i);
+        Sleep(0.01);
+    }
+     Sleep(2.0);
 
 //     //back arm out of basket
 //     percent = -turn_power;
 //     counts = (CPI*3);
 //     move_forward(percent, counts);
 
-//     //raise arm back up to top
-//     for(i; i>0; i--){
-//         arm_servo.SetDegree(0+i);
-//         Sleep(0.01);
-//     }
+    //raise arm back up to top
+    for(i; i>0; i--){
+        arm_servo.SetDegree(0+i);
+        Sleep(0.01);
+    }
+     Sleep(2.0);
 
-//     //follow line backwards to turn junction
-//     percent = -turn_power;
-//     follow_line(percent);
+    //follow line backwards to turn junction
+    percent = -turn_power;
+    follow_line(percent);
 
-//     ////////////////////////
-//     ////STARTING LEVERS/////
-//     ///////////////////////
+    ////////////////////////
+    ////STARTING LEVERS/////
+    ///////////////////////
 
-//     //make 45 degree turn to face levers
-//     percent = turn_power;
-//     counts = (CPI*TR*2*pi/8);
-//     turn_counterclockwise_center(percent, counts);
+    //make 45 degree turn to face levers
+    percent = turn_power;
+    counts = (CPI*TR*2*pi/8);
+    turn_counterclockwise_center(percent, counts);
 
-//     //get info from course and navigate to lever
-//     choose_lever();
+    //get info from course and navigate to lever
+    choose_lever();
+
+    
 
 
 
@@ -580,42 +611,6 @@ void ERCMain()
     // follow_line(percent);
 
 
-//encoder testing loop
-    while(true)
-    {
-        int percent, counts;
 
-        percent = turn_power;
-        counts = (CPI*2*TR*2*pi);
-        turn_about_left(percent, counts);
-        Sleep(2.0);
-
-        percent = turn_power;
-        counts = (CPI*2*TR*2*pi);
-        turn_about_right(percent, counts);
-        Sleep(2.0);
-
-        percent = turn_power;
-        counts = (CPI*TR*2*pi);
-        turn_counterclockwise_center(percent, counts);
-        Sleep(2.0);
-
-        percent = -turn_power;
-        counts = (CPI*TR*2*pi);
-        turn_counterclockwise_center(percent, counts);
-        Sleep(2.0);
-
-        percent = turn_power;
-        counts = (CPI*6);
-        move_forward(percent, counts);
-        Sleep(2.0);
-
-        percent = -turn_power;
-        counts = (CPI*6);
-        move_forward(percent, counts);
-        Sleep(2.0);
-
-
-    }
 
 }
