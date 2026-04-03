@@ -273,19 +273,19 @@ void follow_line (int percent)
     // left_value = left_opto.Value();
 
 
-        if((right_opto.Value() >= 3))
+        if((right_opto.Value() >= 4.2))
         {
-        right_motor.Stop();
+        right_motor.SetPercent(-(percent+5));
         left_motor.SetPercent(percent);
         }
 
-        else if ((left_opto.Value() >= 3))
+        else if ((left_opto.Value() >= 4.2))
         {
-        left_motor.Stop();
+        left_motor.SetPercent(-(percent+5));
         right_motor.SetPercent(percent);
         }
 
-        else if(center_opto.Value() > 3)
+        else if(center_opto.Value() > 4.2)
         {
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
@@ -294,7 +294,7 @@ void follow_line (int percent)
         //add cases for two seeing black where it makes a 90 degree turn
         //in the given direction
 
-        else if ((left_opto.Value() <= 3) && (center_opto.Value() <=3) && (right_opto.Value() <=3))
+        else if ((left_opto.Value() <= 2.5) && (center_opto.Value() <=2.5) && (right_opto.Value() < 2.5))
         {
         right_motor.Stop();
         left_motor.Stop();
@@ -355,43 +355,114 @@ void follow_line_counts (int percent, int counts)
 
 }
 
-//protocol for navigating to the left lever
-void left_lever()
+void left_lever(int percent, int counts)
 {
 
+//rotate 45 degrees
+//move to left line
+//move forward
+//flip lever up
+//move back
+//move lever arm
+//move up
+//put lever down
+
+percent = turn_power;
+counts = (TR*2*pi/8);
+turn_counterclockwise_center(percent, counts);
+
+counts = (CPI*5);
+move_forward(percent, counts);
+counts = (TR*2*pi/4);
+turn_counterclockwise_center(percent, counts);
+counts = (CPI*1);
+move_forward(percent, counts);
+counts = (TR*2*pi/4);
+turn_counterclockwise_center(-percent, counts);
+follow_line(percent);
+
+
+arm_servo.SetDegree(0);
+Sleep(1.0);
+
+counts = (CPI*.5);
+move_forward(-percent, counts);
+arm_servo.SetDegree(60);
+move_forward(percent,counts);
+arm_servo.SetDegree(0);
 
 }
 
 //protocol for navigating to the center lever
-void center_lever()
+void center_lever(int percent, int counts)
 {
+percent = turn_power;
+counts = (TR*2*pi/8);
+turn_counterclockwise_center(percent, counts);
+
+counts = (CPI*5);
+move_forward(percent, counts);
+follow_line(percent);
+
+arm_servo.SetDegree(75);
+Sleep(1.0);
+
+counts = (CPI*.5);
+move_forward(-percent, counts);
+arm_servo.SetDegree(90);
+move_forward(percent,counts);
+arm_servo.SetDegree(0);
+
+
 
 }
 
 //protocol for navigating to the right lever
-void right_lever()
+void right_lever(int percent, int counts)
 {
+percent = turn_power;
+counts = (TR*2*pi/8);
+turn_counterclockwise_center(percent, counts);
+
+
+counts = (CPI*5);
+move_forward(percent, counts);
+counts = (TR*2*pi/4);
+turn_counterclockwise_center(-percent, counts);
+counts = (CPI*1);
+move_forward(percent, counts);
+counts = (TR*2*pi/4);
+turn_counterclockwise_center(percent, counts);
+follow_line(percent);
+
+counts = (CPI*.5);
+move_forward(-percent, counts);
+arm_servo.SetDegree(60);
+move_forward(percent,counts);
+arm_servo.SetDegree(0);
 
 }
+
 
 //decision program for navigating to levers
 void choose_lever()
 {
     int lever_choice = RCS.GetLever();
+    int percent, counts;
 
     if(lever_choice == 0)
     {
-        left_lever();
+        left_lever(percent, counts);
     }
 
     else if(lever_choice == 1)
     {
-        center_lever();
+        center_lever(percent, counts);
     }
 
     else if(lever_choice == 2)
     {
-        right_lever();
+        right_lever(percent, counts);
     }
 
 }
@@ -408,13 +479,24 @@ void ERCMain()
   //180 degree is vertical
   //90 degree is horizontal
 
-
     int counts;
     int percent;
     int percent_R, percent_L;
 
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
+
+    // while(true){
+    //     LCD.Write(right_opto.Value());
+    //     LCD.Write(center_opto.Value());
+    //     LCD.Write(left_opto.Value());
+
+    //     Sleep(0.5);
+    //     LCD.Clear();
+    // }
+
+    // //initialize the RCS
+    // RCS.InitializeTouchMenu("1130D8HDL");
 
     arm_servo.SetDegree(0);
     LCD.Write("servo");
@@ -447,10 +529,9 @@ void ERCMain()
 
     //drive straight forward and look for line
     percent = turn_power;
-    counts = (CPI*9);
+    counts = (CPI*14);
     move_forward(percent, counts);
      LCD.Write("drive");
-     Sleep(1.5);
     // look_for_line(percent);
 
     //lower arm to interface w basket
@@ -460,22 +541,19 @@ void ERCMain()
         Sleep(0.01);
     }
      LCD.Write("arm down");
-     Sleep(1.5);
 
     //follow line until turn
-    percent = turn_power-10;
+    percent = turn_power+5;
     counts = (CPI*10); 
     follow_line(percent); //will break when none on black, AKA at 90 turn
      LCD.Write("follow");
-     Sleep(1.5);
     //follow_line_counts(percent, counts);
 
     //turn to align
     percent = -turn_power;
-    counts = (CPI*0.5);
+    counts = (CPI*1.5);
     turn_about_right(percent, counts);
      LCD.Write("align");
-     Sleep(1.5);
 
     //drive into basket to grab
     percent = turn_power;
@@ -493,7 +571,7 @@ void ERCMain()
      Sleep(1.5);
 
     //go back the way it came and follow line out
-    percent = -drive_power;
+    percent = -turn_power/2;
     counts = (CPI*8);
     move_forward(percent, counts);
     follow_line(percent);
