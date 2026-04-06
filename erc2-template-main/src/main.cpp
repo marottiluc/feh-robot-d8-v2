@@ -22,6 +22,7 @@ FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 AnalogInputPin CdS_cell(FEHIO::Pin2);
 FEHServo arm_servo(FEHServo::Servo0);
+FEHServo wheel_servo(FEHServo::Servo1);
 AnalogInputPin left_opto(FEHIO::Pin4);
 AnalogInputPin center_opto(FEHIO::Pin6);
 AnalogInputPin right_opto(FEHIO::Pin7);
@@ -447,6 +448,40 @@ void choose_lever()
 
 }
 
+void arm_servo_up (int i, int target_angle) //for raising the arm 
+{
+  for(i; i<target_angle; i++){
+        arm_servo.SetDegree(i);
+        Sleep(0.01);
+    }
+
+}
+
+void arm_servo_down (int i, int target_angle) //for lowering the arm 
+{
+  for(i; i>target_angle; i--){
+        arm_servo.SetDegree(i);
+        Sleep(0.01);
+    }
+
+}
+
+void wheel_pos (int i, int target_angle) //rotating wheel forward
+{
+  for(i; i<target_angle; i++){
+        wheel_servo.SetDegree(i);
+        Sleep(0.01);
+    }
+}
+
+void wheel_neg (int i, int target_angle) //rotating wheel backwards
+{
+  for(i; i>target_angle; i--){
+        wheel_servo.SetDegree(i);
+        Sleep(0.01);
+    }
+}
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -462,6 +497,8 @@ void ERCMain()
     int counts;
     int percent;
     int percent_R, percent_L;
+    int target_angle;
+    int i;
 
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
@@ -481,278 +518,82 @@ void ERCMain()
     arm_servo.SetDegree(0);
     LCD.Write("servo");
 
-    
-    // // testing protocols for optosensors
-    //    while(true){
-    //     LCD.Write(right_opto.Value());
-    //     LCD.Write(center_opto.Value());
-    //     LCD.Write(left_opto.Value());
-
-    //     Sleep(0.5);
-    //     LCD.Clear();
-
-        
-    // }
-
-    // //read start light
-    // read_start();
-    // LCD.Write("cds");
+    //read start light
+    read_start();
+    LCD.Write("  cds");
 
     //back into start button
     counts = (CPI*1.5);
     percent = -drive_power/2;
     move_forward(percent, counts);
-    LCD.Write("motor");
+    LCD.Write("  start button");
 
     Sleep(0.25);
-    LCD.Write("sleep");
+    LCD.Write("  sleep");
 
-    //drive straight forward and look for line
+    //drive straight to junction of 45 and line
     percent = turn_power;
-    counts = (CPI*14);
+    counts = (CPI*22); //measure and check
     move_forward(percent, counts);
-     LCD.Write("drive");
-    // look_for_line(percent);
+    LCD.Write("  drive");
 
-    //lower arm to interface w basket
-    int i = 0;
-    for(i=0; i<55; i++){
-        arm_servo.SetDegree(i);
-        Sleep(0.01);
-    }
-     LCD.Write("arm down");
+    //turn 135 CCW to be facing compost bin
+    percent = turn_power;
+    counts = (CPI*TR*2*pi*3/8);
+    turn_counterclockwise_center(percent, counts);
+    LCD.Write("  135 turn");
 
-     //45 degree about right
-     percent = turn_power;
-     counts = (CPI*2*pi*2*TR/8);
-     turn_about_right(percent, counts);
-     LCD.Write("45 deg");
+    //reach line before following
+    percent = turn_power;
+    counts = (CPI*8); //measure and check
+    move_forward(percent, counts);
+    LCD.Write("  drive to line");
 
-     //90 degrees about left
-     percent = turn_power;
-     counts = (CPI*2*pi*2*TR/4);
-     turn_about_left(percent, counts);
-     LCD.Write("90 deg");
-
-     //backwards to align
-     percent = -turn_power;
-     counts = (CPI*4);
-     move_forward(percent, counts);
-
-    //follow line until turn
-    percent = turn_power+5;
-    counts = (CPI*10); 
-    follow_line(percent); //will break when none on black, AKA at 90 turn
-     LCD.Write("follow");
+    //lock on to line to align
+    follow_line(percent);
+    LCD.Write("  follow line");
+    // //alternatively, follow for given distance
+    //percent = turn_power;
+    //counts = (CPI*20); //measure and check
     //follow_line_counts(percent, counts);
 
-    //drive into basket to grab
-    percent = turn_power;
-    counts = (CPI*0.5);
-    move_forward(percent, counts);
-     LCD.Write("grab basket");
+    // //close gap to interface with compost bin
+    //percent = turn_power;
+    //counts (CPI*1);
+    //move_forward(percent, counts);
+    //LCD.Write("  close gap");
+
+    //drive servo forward for a 270 rotation of compost bin
+    i = 0;
+    target_angle = 575;
+    wheel_pos(i, target_angle);
+    LCD.Write("  270 forward");
     Sleep(1.0);
 
-    //raise arm 15 degrees
-    for(i; i>20; i--){
-        arm_servo.SetDegree(i);
-        Sleep(0.01);
-    }
-     LCD.Write("raise arm");
-     Sleep(1.5);
+    //drive servo backward for a 270 rotation back to start
+    i = target_angle;
+    target_angle = 0;
+    wheel_pos(i, target_angle);
+    LCD.Write("  270 backwards");
+    Sleep(1.0);
 
-    //45 degree about left (backwards)
-     percent = -turn_power;
-     counts = (CPI*2*pi*2*TR/8);
-     turn_about_left(percent, counts);
-     LCD.Write("45 deg");
-
-     //backwards for spacing
-     percent = -turn_power;
-     counts = (CPI*5);
-     move_forward(percent, counts);
-    
-     //45 degree about right (backwards)
-     percent = -turn_power;
-     counts = (CPI*2*pi*2*TR/8);
-     turn_about_right(percent, counts);
-     LCD.Write("45 deg");
-
-     //backwards to hit wall
-     percent = -turn_power;
-     counts = (CPI*20);
-     move_forward(percent, counts);
-
-     //forwards for ramp
-     percent = turn_power;
-     counts = (CPI*1);
-     move_forward(percent, counts);
-
-     //90 degrees about right
-     percent = turn_power;
-     counts = (CPI*2*pi*2*TR/3.5);
-     turn_about_right(percent, counts);
-     LCD.Write("90 deg");
-
-    //drive up ramp and catch line
-    counts = (CPI*22); //DOUBLE CHECK
-    percent = drive_power;
-    move_forward(percent, counts);
-     LCD.Write("up ramp");
-
-
-    /////////////////////
-    /////UPPER LEVEL/////
-    /////////////////////
-
-    // //follow along line until 90 degree turn
-    // percent = turn_power;
-    // counts = (CPI*4);
-    // follow_line_counts(percent, counts);
-
-    // //90 degrees about left
-    //  percent = turn_power;
-    //  counts = (CPI*2*pi*2*TR/4);
-    //  turn_about_left(percent, counts);
-    //  LCD.Write("90 deg");
-
-    //   //90 degrees about right
-    //  percent = turn_power;
-    //  counts = (CPI*2*pi*2*TR/4);
-    //  turn_about_right(percent, counts);
-    //  LCD.Write("90 deg");
-
-    // // XXXXX make manual 45 degree turn XXXXX
-    percent = turn_power;
-    counts = (TR*2*pi/6);
-    // turn_counterclockwise_center(percent, counts);
-    //  LCD.Write("45 for line");
-
-    // Reset encoder counts
-    right_encoder.ResetCounts();
-    left_encoder.ResetCounts();
-
-    // Set both motors to desired percent
-    right_motor.SetPercent(percent);
-    left_motor.SetPercent(-percent);
-
-    // While the average of the left and right encoder are less than counts,
-    // keep running motors
-    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts);
-
-    // Turn off motors
-    right_motor.Stop();
-    left_motor.Stop();
-
-    //drive forward to try and catch line 
-    percent = turn_power;
-    counts = (CPI*6);
-    move_forward(percent, counts);
-     LCD.Write("forward to line");
-
-    //follow line to apple crate
-    percent = turn_power;
-    counts = (CPI*19);
-    follow_line_counts(percent, counts);
-     LCD.Write("caught line");
-
-    //align on crate
-    percent = turn_power; 
-    counts = (CPI*2);
-    move_forward(percent, counts);
-
-    percent = -turn_power; //back out slightly so basket does not hit back of crate
-    counts = (CPI*0.25);
-    move_forward(percent, counts);
-
-    //lower basket into crate (down 30 degrees, get to 80 degrees)
-    for(i; i<80; i++){
-        arm_servo.SetDegree(i);
-        Sleep(0.01);
-    }
-
-    //back arm out of basket
+    //follow line backwards to junction
     percent = -turn_power;
-    counts = (CPI*3);
+    counts = (CPI*28); //measure and check
     move_forward(percent, counts);
+    LCD.Write("  backwards to junction");
 
-    //raise arm back up to top
-    for(i; i>0; i--){
-        arm_servo.SetDegree(i);
-        Sleep(0.01);
-    }
-
-    //follow line backwards to turn junction
+    //135 deg counterclockwise to orient back to start button
     percent = -turn_power;
-    counts = (CPI*17.5); //DOUBLE CHECK
-    move_forward(percent, counts);
-    //change to shaft encode
-
-    ////////////////////////
-    ////STARTING LEVERS/////
-    ///////////////////////
-
-    //make 45 degree turn to face levers
-    percent = turn_power;
-    counts = (CPI*TR*2*pi/8);
+    counts = (CPI*TR*2*pi*3/8);
     turn_counterclockwise_center(percent, counts);
+    LCD.Write("  135 turn");
 
-    //get info from course and navigate to lever //12 inches to levers
-    center_lever(percent, counts);
-
-    // //once the lever is approached, lower the arm to flick the lever down
-    // for(i; i<60; i++){
-    //     arm_servo.SetDegree(i);
-    //     Sleep(0.025);
-    // }
-    // Sleep(1.0);
-
-    // //drive back
-    // percent = -turn_power;
-    // counts = (CPI*3);
-    // move_forward(percent, counts);
-
-    // //lower servo and wait
-    // for(i; i<90; i++){
-    //     arm_servo.SetDegree(i);
-    //     Sleep(0.01);
-    // }
-    // Sleep(5.0);
-
-    // //drive forward
-    // percent = turn_power;
-    // counts = (CPI*3);
-    // move_forward(percent, counts);
-
-    // //lift arm back up
-    // for(i; i>45; i--){
-    //     arm_servo.SetDegree(i);
-    //     Sleep(0.025);
-    // }
-
-
-
-
-
-
-
-
-
-
-
-
-    // testing protocols for optosensors
-       // while(true){
-    //     LCD.Write(right_opto.Value());
-    //     LCD.Write(center_opto.Value());
-    //     LCD.Write(left_opto.Value());
-
-    //     Sleep(0.5);
-    //     LCD.Clear();
-
-        
-    // }
-
+    //drive backwards to start
+    percent = -turn_power;
+    counts = (CPI*25); //measure and check
+    move_forward(percent, counts);
+    LCD.Write("  drive home");
 
 
 
