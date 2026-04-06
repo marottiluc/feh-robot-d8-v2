@@ -489,54 +489,16 @@ void ERCMain()
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
 
-    // while(true){
-    //     LCD.Write(right_opto.Value());
-    //     LCD.Write(center_opto.Value());
-    //     LCD.Write(left_opto.Value());
-
-    //     Sleep(0.5);
-    //     LCD.Clear();
-    // }
-
     // //initialize the RCS
     // RCS.InitializeTouchMenu("1130D8HDL");
 
-    while(true){
-    wheel_servo.SetDegree(110);
-    Sleep(1.5);
-
-    wheel_servo.SetDegree(105);
-    Sleep(1.5);
-
-    wheel_servo.SetDegree(100);
-    Sleep(1.5);
-
-    wheel_servo.SetDegree(95);
-    Sleep(1.5);
-
-    wheel_servo.SetDegree(90);
-    Sleep(1.5);
-
-    wheel_servo.SetDegree(95);
-    Sleep(1.5);
-
-    wheel_servo.SetDegree(100);
-    Sleep(1.5);
-
-    wheel_servo.SetDegree(105);
-    Sleep(1.5);
-
-    wheel_servo.SetDegree(110);
-    Sleep(1.5);
-
-    }
-
-    arm_servo.SetDegree(0);
-    LCD.Write("servo");
-
     //read start light
     read_start();
-    LCD.Write("  cds");
+    LCD.Write("cds");
+
+    //reset arm servo
+    arm_servo.SetDegree(0);
+    LCD.Write("  servo");
 
     //back into start button
     counts = (CPI*1.5);
@@ -580,18 +542,14 @@ void ERCMain()
     //LCD.Write("  close gap");
 
     //drive servo forward for a 270 rotation of compost bin
-    i = 0;
-    target_angle = 575;
-    // wheel_pos(i, target_angle);
+    wheel_servo.SetDegree(100);
     LCD.Write("  270 forward");
-    Sleep(1.0);
+    Sleep(5.0);
 
     //drive servo backward for a 270 rotation back to start
-    i = target_angle;
-    // target_angle = 0;
-    // wheel_pos(i, target_angle);
+    wheel_servo.SetDegree(80);
     LCD.Write("  270 backwards");
-    Sleep(1.0);
+    Sleep(5.0);
 
     //follow line backwards to junction
     percent = -turn_power;
