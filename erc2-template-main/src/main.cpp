@@ -263,16 +263,8 @@ void look_for_line (int percent) //times out after 30 seconds
 
 void follow_line (int percent)
 {
-    // float right_value, center_value, left_value;
-
     while(true)
     {
-    //black lines >4, all else <4
-    // right_value = right_opto.Value();
-    // center_value = center_opto.Value();
-    // left_value = left_opto.Value();
-
-
         if((right_opto.Value() >= 4.2))
         {
         right_motor.SetPercent(-(percent+5));
@@ -291,24 +283,12 @@ void follow_line (int percent)
         left_motor.SetPercent(percent);
         }
 
-        //add cases for two seeing black where it makes a 90 degree turn
-        //in the given direction
-
         else if ((left_opto.Value() <= 2.5) && (center_opto.Value() <=2.5) && (right_opto.Value() < 2.5))
         {
         right_motor.Stop();
         left_motor.Stop();
         Sleep(0.5);
         LCD.Write("STOP: All White");
-        break;
-        }
-
-        else if (((left_opto.Value() > 4.5) && (center_opto.Value() > 4.5)) || ((right_opto.Value() > 4.5) && (center_opto.Value() > 4.5)))
-        {
-        right_motor.Stop();
-        left_motor.Stop();
-        Sleep(0.5);
-        LCD.Write("STOP: Expected Turn");
         break;
         }
 
@@ -615,7 +595,7 @@ void ERCMain()
      LCD.Write("90 deg");
 
     //drive up ramp and catch line
-    counts = (CPI*12);
+    counts = (CPI*12); //DOUBLE CHECK
     percent = turn_power;
     move_forward(percent, counts);
 
@@ -626,19 +606,30 @@ void ERCMain()
     //follow along line until 90 degree turn
     percent = turn_power;
     counts = (CPI*9);
-    follow_line_counts(percent, counts);
+    follow_line(percent);
+    // follow_line_counts(percent, counts);
 
-    //90 about left and 90 about right
+    //90 degrees about left
+     percent = turn_power;
+     counts = (CPI*2*pi*2*TR/4);
+     turn_about_left(percent, counts);
+     LCD.Write("90 deg");
 
-    // XXXXX make manual 45 degree turn XXXXX
-    percent = turn_power;
-    counts = (TR*2*pi/8);
-    turn_counterclockwise_center(percent, counts);
+      //90 degrees about right
+     percent = turn_power;
+     counts = (CPI*2*pi*2*TR/4);
+     turn_about_right(percent, counts);
+     LCD.Write("90 deg");
 
-    //drive forward to try and catch line 
-    percent = turn_power;
-    look_for_line(percent);
-    //change to shaft encode then regular follow function
+    // // XXXXX make manual 45 degree turn XXXXX
+    // percent = turn_power;
+    // counts = (TR*2*pi/8);
+    // turn_counterclockwise_center(percent, counts);
+
+    // //drive forward to try and catch line 
+    // percent = turn_power;
+    // look_for_line(percent);
+    // //change to shaft encode then regular follow function
 
     //follow line to apple crate
     percent = turn_power;
@@ -672,7 +663,8 @@ void ERCMain()
 
     //follow line backwards to turn junction
     percent = -turn_power;
-    follow_line(percent);
+    counts = (CPI*15); //DOUBLE CHECK
+    move_forward(percent, counts);
     //change to shaft encode
 
     ////////////////////////
