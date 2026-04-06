@@ -13,6 +13,7 @@
 #define drive_power -40
 #define servo_min 500
 #define servo_max 1561
+#define wheel_speed = 100;
 
 //Declarations for encoders & motors
 //left and right as view from the front 
@@ -466,21 +467,6 @@ void arm_servo_down (int i, int target_angle) //for lowering the arm
 
 }
 
-void wheel_pos (int i, int target_angle) //rotating wheel forward
-{
-  for(i; i<target_angle; i++){
-        wheel_servo.SetDegree(i);
-        Sleep(0.01);
-    }
-}
-
-void wheel_neg (int i, int target_angle) //rotating wheel backwards
-{
-  for(i; i>target_angle; i--){
-        wheel_servo.SetDegree(i);
-        Sleep(0.01);
-    }
-}
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -514,6 +500,36 @@ void ERCMain()
 
     // //initialize the RCS
     // RCS.InitializeTouchMenu("1130D8HDL");
+
+    while(true){
+    wheel_servo.SetDegree(110);
+    Sleep(1.5);
+
+    wheel_servo.SetDegree(105);
+    Sleep(1.5);
+
+    wheel_servo.SetDegree(100);
+    Sleep(1.5);
+
+    wheel_servo.SetDegree(95);
+    Sleep(1.5);
+
+    wheel_servo.SetDegree(90);
+    Sleep(1.5);
+
+    wheel_servo.SetDegree(95);
+    Sleep(1.5);
+
+    wheel_servo.SetDegree(100);
+    Sleep(1.5);
+
+    wheel_servo.SetDegree(105);
+    Sleep(1.5);
+
+    wheel_servo.SetDegree(110);
+    Sleep(1.5);
+
+    }
 
     arm_servo.SetDegree(0);
     LCD.Write("servo");
@@ -566,14 +582,14 @@ void ERCMain()
     //drive servo forward for a 270 rotation of compost bin
     i = 0;
     target_angle = 575;
-    wheel_pos(i, target_angle);
+    // wheel_pos(i, target_angle);
     LCD.Write("  270 forward");
     Sleep(1.0);
 
     //drive servo backward for a 270 rotation back to start
     i = target_angle;
-    target_angle = 0;
-    wheel_pos(i, target_angle);
+    // target_angle = 0;
+    // wheel_pos(i, target_angle);
     LCD.Write("  270 backwards");
     Sleep(1.0);
 
