@@ -380,7 +380,7 @@ percent = turn_power;
 counts = (TR*2*pi/8);
 turn_counterclockwise_center(percent, counts);
 
-counts = (CPI*5);
+counts = (CPI*15); //measured
 move_forward(percent, counts);
 follow_line(percent);
 
@@ -569,7 +569,7 @@ void ERCMain()
 
      //backwards for spacing
      percent = -turn_power;
-     counts = (CPI*1);
+     counts = (CPI*5);
      move_forward(percent, counts);
     
      //45 degree about right (backwards)
@@ -590,50 +590,71 @@ void ERCMain()
 
      //90 degrees about right
      percent = turn_power;
-     counts = (CPI*2*pi*2*TR/4);
+     counts = (CPI*2*pi*2*TR/3.5);
      turn_about_right(percent, counts);
      LCD.Write("90 deg");
 
     //drive up ramp and catch line
-    counts = (CPI*12); //DOUBLE CHECK
-    percent = turn_power;
+    counts = (CPI*22); //DOUBLE CHECK
+    percent = drive_power;
     move_forward(percent, counts);
+     LCD.Write("up ramp");
+
 
     /////////////////////
     /////UPPER LEVEL/////
     /////////////////////
 
-    //follow along line until 90 degree turn
-    percent = turn_power;
-    counts = (CPI*9);
-    follow_line(percent);
+    // //follow along line until 90 degree turn
+    // percent = turn_power;
+    // counts = (CPI*4);
     // follow_line_counts(percent, counts);
 
-    //90 degrees about left
-     percent = turn_power;
-     counts = (CPI*2*pi*2*TR/4);
-     turn_about_left(percent, counts);
-     LCD.Write("90 deg");
+    // //90 degrees about left
+    //  percent = turn_power;
+    //  counts = (CPI*2*pi*2*TR/4);
+    //  turn_about_left(percent, counts);
+    //  LCD.Write("90 deg");
 
-      //90 degrees about right
-     percent = turn_power;
-     counts = (CPI*2*pi*2*TR/4);
-     turn_about_right(percent, counts);
-     LCD.Write("90 deg");
+    //   //90 degrees about right
+    //  percent = turn_power;
+    //  counts = (CPI*2*pi*2*TR/4);
+    //  turn_about_right(percent, counts);
+    //  LCD.Write("90 deg");
 
     // // XXXXX make manual 45 degree turn XXXXX
-    // percent = turn_power;
-    // counts = (TR*2*pi/8);
+    percent = turn_power;
+    counts = (TR*2*pi/6);
     // turn_counterclockwise_center(percent, counts);
+    //  LCD.Write("45 for line");
 
-    // //drive forward to try and catch line 
-    // percent = turn_power;
-    // look_for_line(percent);
-    // //change to shaft encode then regular follow function
+    // Reset encoder counts
+    right_encoder.ResetCounts();
+    left_encoder.ResetCounts();
+
+    // Set both motors to desired percent
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(-percent);
+
+    // While the average of the left and right encoder are less than counts,
+    // keep running motors
+    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts);
+
+    // Turn off motors
+    right_motor.Stop();
+    left_motor.Stop();
+
+    //drive forward to try and catch line 
+    percent = turn_power;
+    counts = (CPI*6);
+    move_forward(percent, counts);
+     LCD.Write("forward to line");
 
     //follow line to apple crate
     percent = turn_power;
-    follow_line(percent);
+    counts = (CPI*19);
+    follow_line_counts(percent, counts);
+     LCD.Write("caught line");
 
     //align on crate
     percent = turn_power; 
@@ -663,7 +684,7 @@ void ERCMain()
 
     //follow line backwards to turn junction
     percent = -turn_power;
-    counts = (CPI*15); //DOUBLE CHECK
+    counts = (CPI*17.5); //DOUBLE CHECK
     move_forward(percent, counts);
     //change to shaft encode
 
@@ -676,8 +697,8 @@ void ERCMain()
     counts = (CPI*TR*2*pi/8);
     turn_counterclockwise_center(percent, counts);
 
-    //get info from course and navigate to lever
-    choose_lever();
+    //get info from course and navigate to lever //12 inches to levers
+    center_lever(percent, counts);
 
     // //once the lever is approached, lower the arm to flick the lever down
     // for(i; i<60; i++){
