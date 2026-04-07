@@ -312,28 +312,41 @@ void follow_line (int percent)
 
 void follow_line_counts (int percent, int counts)
 {
+    right_encoder.ResetCounts();
+    left_encoder.ResetCounts();
+
     while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
     {
-        if((right_opto.Value() >= 3))
+       if((right_opto.Value() >= 4.2))
+        {
+        right_motor.SetPercent(-(percent+5));
+        left_motor.SetPercent(percent);
+        }
+
+        else if ((left_opto.Value() >= 4.2))
+        {
+        left_motor.SetPercent(-(percent+5));
+        right_motor.SetPercent(percent);
+        }
+
+        else if(center_opto.Value() > 4.2)
+        {
+        right_motor.SetPercent(percent);
+        left_motor.SetPercent(percent);
+        }
+
+        else if ((left_opto.Value() <= 2.5) && (center_opto.Value() <=2.5) && (right_opto.Value() < 2.5))
         {
         right_motor.Stop();
-        left_motor.SetPercent(percent);
-        }
-
-        else if ((left_opto.Value() >= 3))
-        {
         left_motor.Stop();
-        right_motor.SetPercent(percent);
+        Sleep(0.5);
+        LCD.Write("STOP: All White");
+        break;
         }
-
-        else if(center_opto.Value() > 3)
-        {
-        right_motor.SetPercent(percent);
-        left_motor.SetPercent(percent);
-        }
-
     }
-
+    
+    right_motor.Stop();
+    left_motor.Stop();
 
 }
 
@@ -477,8 +490,18 @@ void arm_servo_down (int i, int target_angle) //for lowering the arm
 void ERCMain()
 {
   //counts/inch for 3" wheels : 33.74
+
+  //for arm servo
   //180 degree is vertical
   //90 degree is horizontal
+
+  //for wheel servo
+  //90 is stop
+  //less than 90 is forwards
+  //greater than 90 is backwards
+  //the further from 90, the faster
+  //sweet spots -> 80 for for, 100 for back
+
 
     int counts;
     int percent;
@@ -508,66 +531,6 @@ void ERCMain()
 
     Sleep(0.25);
     LCD.Write("  sleep");
-
-    //drive straight to junction of 45 and line
-    percent = turn_power;
-    counts = (CPI*22); //measure and check
-    move_forward(percent, counts);
-    LCD.Write("  drive");
-
-    //turn 135 CCW to be facing compost bin
-    percent = turn_power;
-    counts = (CPI*TR*2*pi*3/8);
-    turn_counterclockwise_center(percent, counts);
-    LCD.Write("  135 turn");
-
-    //reach line before following
-    percent = turn_power;
-    counts = (CPI*8); //measure and check
-    move_forward(percent, counts);
-    LCD.Write("  drive to line");
-
-    //lock on to line to align
-    follow_line(percent);
-    LCD.Write("  follow line");
-    // //alternatively, follow for given distance
-    //percent = turn_power;
-    //counts = (CPI*20); //measure and check
-    //follow_line_counts(percent, counts);
-
-    // //close gap to interface with compost bin
-    //percent = turn_power;
-    //counts (CPI*1);
-    //move_forward(percent, counts);
-    //LCD.Write("  close gap");
-
-    //drive servo forward for a 270 rotation of compost bin
-    wheel_servo.SetDegree(100);
-    LCD.Write("  270 forward");
-    Sleep(5.0);
-
-    //drive servo backward for a 270 rotation back to start
-    wheel_servo.SetDegree(80);
-    LCD.Write("  270 backwards");
-    Sleep(5.0);
-
-    //follow line backwards to junction
-    percent = -turn_power;
-    counts = (CPI*28); //measure and check
-    move_forward(percent, counts);
-    LCD.Write("  backwards to junction");
-
-    //135 deg counterclockwise to orient back to start button
-    percent = -turn_power;
-    counts = (CPI*TR*2*pi*3/8);
-    turn_counterclockwise_center(percent, counts);
-    LCD.Write("  135 turn");
-
-    //drive backwards to start
-    percent = -turn_power;
-    counts = (CPI*25); //measure and check
-    move_forward(percent, counts);
-    LCD.Write("  drive home");
 
 
 
