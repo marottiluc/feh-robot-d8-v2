@@ -21,7 +21,7 @@ DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
 FEHMotor left_motor(FEHMotor::Motor1, 9.0);
-AnalogInputPin CdS_cell(FEHIO::Pin2);
+AnalogInputPin CdS_cell(FEHIO::Pin0);
 FEHServo arm_servo(FEHServo::Servo0);
 FEHServo wheel_servo(FEHServo::Servo1);
 AnalogInputPin left_opto(FEHIO::Pin4);
@@ -500,7 +500,7 @@ void ERCMain()
   //less than 90 is forwards
   //greater than 90 is backwards
   //the further from 90, the faster
-  //sweet spots -> 80 for for, 100 for back
+  //sweet spots -> 75 for for, 105 for back
 
 
     int counts;
@@ -512,11 +512,12 @@ void ERCMain()
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
 
-    // //initialize the RCS
-    // RCS.InitializeTouchMenu("1130D8HDL");
+    //initialize the RCS
+    RCS.InitializeTouchMenu("1130D8HDL");
 
     //read start light
     read_start();
+    LCD.Write(CdS_cell.Value());
     LCD.Write("cds");
 
     //reset arm servo
@@ -531,6 +532,88 @@ void ERCMain()
 
     Sleep(0.25);
     LCD.Write("  sleep");
+
+    //drive forward for 9
+    percent = turn_power;
+    counts = (CPI*10);
+    move_forward(percent, counts);
+
+    //turn 45 about left wheel
+    percent = turn_power;
+    counts = (CPI*2*TR*2*pi/8);
+    turn_about_left(percent, counts);
+
+    //drive forward into wall
+    percent = turn_power;
+    counts = (CPI*14);
+    move_forward(percent, counts);
+
+    //drive backwards 1 to prep for turn
+    percent = -drive_power;
+    counts = (CPI*1);
+    move_forward(percent, counts);
+
+    //90 degrees counterclockwise about center
+    percent = turn_power;
+    counts = (CPI*TR*2*pi/3.75);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive forward into robot and keep motors moving
+    percent = turn_power/2;
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent);
+
+    //turn on wheel servo forward
+    wheel_servo.SetDegree(70);
+    Sleep(1.5);
+
+    //pause for a bit
+    wheel_servo.SetDegree(90);
+    Sleep(1.5); 
+
+    //turn wheel servo backwards
+    wheel_servo.SetDegree(105);
+    Sleep(1.5);
+
+    //stop wheel servo
+    wheel_servo.SetDegree(90);
+
+    //stop motors and run drive sequence backwards
+    right_motor.Stop();
+    left_motor.Stop();
+
+    //drive backwards from bin to make turn
+    percent = turn_power;
+    counts = (CPI*3);
+    move_forward(percent, counts);
+
+    //90 degrees clockwise about center
+    percent = -turn_power;
+    counts = (CPI*TR*2*pi/4);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive forwards into wall to align
+    percent = turn_power;
+    counts = (CPI*4);
+    move_forward(percent, counts);
+
+    //drive backward to starting zone
+    percent = -turn_power;
+    counts = (CPI*21);
+    move_forward(percent, counts);
+
+     //turn backwards 45 about left wheel
+    percent = -turn_power;
+    counts = (CPI*2*TR*2*pi/8);
+    turn_about_left(percent, counts);
+
+    //drive backwards into start button
+    percent = -turn_power;
+    counts = (CPI*12);
+    move_forward(percent, counts);
+
+
+
 
 
 
