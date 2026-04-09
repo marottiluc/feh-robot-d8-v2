@@ -13,7 +13,8 @@
 #define drive_power -40
 #define servo_min 500
 #define servo_max 1561
-#define wheel_speed = 100;
+#define full_turn_center  (CPI*TR*2*pi)
+#define full_turn_about  (CPI*2*TR*2*pi)
 
 //Declarations for encoders & motors
 //left and right as view from the front 
@@ -24,6 +25,7 @@ FEHMotor left_motor(FEHMotor::Motor1, 9.0);
 AnalogInputPin CdS_cell(FEHIO::Pin0);
 FEHServo arm_servo(FEHServo::Servo0);
 FEHServo wheel_servo(FEHServo::Servo1);
+FEHServo window_servo(FEHServo::Servo2);
 AnalogInputPin left_opto(FEHIO::Pin4);
 AnalogInputPin center_opto(FEHIO::Pin6);
 AnalogInputPin right_opto(FEHIO::Pin7);
@@ -153,7 +155,7 @@ void blue_button(int percent, int counts)
 
     //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
     percent = turn_power;
-    counts = CPI*TR*2*pi/4;
+    counts = full_turn_about/4;
     turn_about_left(percent, counts);
 
     //drive forward to be aligned on button (CPI*distance)
@@ -162,7 +164,7 @@ void blue_button(int percent, int counts)
     move_forward(percent, counts);
 
     percent = turn_power;
-    counts = CPI*TR*2*pi/4;
+    counts = full_turn_about/4;
     turn_about_right(percent, counts);
 
     percent = turn_power;
@@ -188,7 +190,7 @@ void red_button(int percent, int counts)
 
     //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
     percent = turn_power;
-    counts = CPI*TR*2*pi/4;
+    counts = (full_turn_about/4);
     turn_about_right(percent, counts);
 
     //drive forward to be aligned on button (CPI*distance)
@@ -197,7 +199,7 @@ void red_button(int percent, int counts)
     move_forward(percent, counts);
 
     percent = turn_power;
-    counts = CPI*TR*2*pi/4;
+    counts = full_turn_about/4;
     turn_about_left(percent, counts);
 
     percent = turn_power;
@@ -363,16 +365,16 @@ void left_lever(int percent, int counts)
 //put lever down
 
 percent = turn_power;
-counts = (TR*2*pi/8);
+counts = (CPI*TR*2*pi/8);
 turn_counterclockwise_center(percent, counts);
 
 counts = (CPI*5);
 move_forward(percent, counts);
-counts = (TR*2*pi/4);
+counts = (CPI*TR*2*pi/4);
 turn_counterclockwise_center(percent, counts);
 counts = (CPI*1);
 move_forward(percent, counts);
-counts = (TR*2*pi/4);
+counts = (CPI*TR*2*pi/4);
 turn_counterclockwise_center(-percent, counts);
 follow_line(percent);
 
@@ -392,7 +394,7 @@ arm_servo.SetDegree(0);
 void center_lever(int percent, int counts)
 {
 percent = turn_power;
-counts = (TR*2*pi/8);
+counts = (CPI*TR*2*pi/8);
 turn_counterclockwise_center(percent, counts);
 
 counts = (CPI*15); //measured
@@ -416,17 +418,17 @@ arm_servo.SetDegree(0);
 void right_lever(int percent, int counts)
 {
 percent = turn_power;
-counts = (TR*2*pi/8);
+counts = (CPI*TR*2*pi/8);
 turn_counterclockwise_center(percent, counts);
 
 
 counts = (CPI*5);
 move_forward(percent, counts);
-counts = (TR*2*pi/4);
+counts = (CPI*TR*2*pi/4);
 turn_counterclockwise_center(-percent, counts);
 counts = (CPI*1);
 move_forward(percent, counts);
-counts = (TR*2*pi/4);
+counts = (CPI*TR*2*pi/4);
 turn_counterclockwise_center(percent, counts);
 follow_line(percent);
 
@@ -480,6 +482,178 @@ void arm_servo_down (int i, int target_angle) //for lowering the arm
 
 }
 
+void start_protocol (int percent, int counts)
+{
+    arm_servo.SetMin(servo_min);
+    arm_servo.SetMax(servo_max);
+
+    //initialize the RCS
+    RCS.InitializeTouchMenu("1130D8HDL");
+
+    //read start light
+    read_start();
+    LCD.Write(CdS_cell.Value());
+    LCD.Write("cds");
+
+    //reset arm servo
+    arm_servo.SetDegree(0);
+    LCD.Write("  servo");
+
+    //back into start button
+    counts = (CPI*1.5);
+    percent = -drive_power/2;
+    move_forward(percent, counts);
+    LCD.Write("  start button");
+
+    Sleep(0.25);
+    LCD.Write("  sleep");
+
+}
+
+void apple_basket(int percent, int counts, int i, int target_angle)
+{
+
+    //drive straight forward and look for line
+    percent = turn_power;
+    counts = (CPI*14);
+    move_forward(percent, counts);
+     LCD.Write("  drive");
+    // look_for_line(percent);
+
+    //lower arm to interface w basket
+    i = 0;
+    target_angle = 55;
+    arm_servo_down(i, target_angle);
+
+     //45 degree about right
+     percent = turn_power;
+     counts = (full_turn_about/8);
+     turn_about_right(percent, counts);
+     LCD.Write("  45 deg");
+
+     //90 degrees about left
+     percent = turn_power;
+     counts = (full_turn_about/4);
+     turn_about_left(percent, counts);
+     LCD.Write("  90 deg");
+
+     //backwards to align
+     percent = -turn_power;
+     counts = (CPI*4);
+     move_forward(percent, counts);
+
+    //follow line until turn
+    percent = turn_power+5;
+    counts = (CPI*10); 
+    follow_line_counts(percent, counts);
+     LCD.Write("  follow");
+
+    //drive into basket to grab
+    percent = turn_power;
+    counts = (CPI*0.5);
+    move_forward(percent, counts);
+     LCD.Write("  grab basket");
+    Sleep(1.0);
+
+    //raise arm 15 degrees
+    target_angle = 20;
+    arm_servo_up(i, target_angle);
+    LCD.Write("  raise arm");
+    Sleep(1.5);
+
+    //45 degree about left (backwards)
+    percent = -turn_power;
+    counts = (full_turn_about/8);
+    turn_about_left(percent, counts);
+    LCD.Write("  45 deg");
+
+    //backwards for spacing
+    percent = -turn_power;
+    counts = (CPI*5);
+    move_forward(percent, counts);
+    LCD.Write("  spacing");
+
+    
+    //45 degree about right (backwards)
+    percent = -turn_power;
+    counts = (full_turn_about/8);
+    turn_about_right(percent, counts);
+    LCD.Write("  45 deg");
+
+    //backwards to hit wall
+    percent = -turn_power;
+    counts = (CPI*20);
+    move_forward(percent, counts);
+
+    //forwards for ramp
+    percent = turn_power;
+    counts = (CPI*1);
+    move_forward(percent, counts);
+
+    //90 degrees about right
+    percent = turn_power;
+    counts = (full_turn_about/3.5);
+    turn_about_right(percent, counts);
+    LCD.Write("90 deg");
+
+    //drive up ramp and catch line
+    counts = (CPI*22); //DOUBLE CHECK
+    percent = drive_power;
+    move_forward(percent, counts);
+    LCD.Write("  up ramp");
+
+
+    /////////////////////
+    /////UPPER LEVEL/////
+    /////////////////////
+
+    // // XXXXX make manual 45 degree turn XXXXX
+    percent = turn_power;
+    counts = (full_turn_about/8);
+    turn_counterclockwise_center(percent, counts);
+    LCD.Write("  45 for line");
+
+    //drive forward to try and catch line 
+    percent = turn_power;
+    counts = (CPI*6);
+    move_forward(percent, counts);
+    LCD.Write("forward to line");
+
+    //follow line to apple crate
+    percent = turn_power;
+    counts = (CPI*19);
+    follow_line_counts(percent, counts);
+    LCD.Write("caught line");
+
+    //align on crate
+    percent = turn_power; 
+    counts = (CPI*2);
+    move_forward(percent, counts);
+
+    percent = -turn_power; //back out slightly so basket does not hit back of crate
+    counts = (CPI*0.25);
+    move_forward(percent, counts);
+
+    //lower basket into crate (down 30 degrees, get to 80 degrees)
+   target_angle = 80;
+   arm_servo_down(i, target_angle);
+
+    //back arm out of basket
+    percent = -turn_power;
+    counts = (CPI*3);
+    move_forward(percent, counts);
+
+    //raise arm back up to top
+    target_angle = 0;
+    arm_servo_up(i, target_angle);
+
+    //follow line backwards to turn junction
+    percent = -turn_power;
+    counts = (CPI*17.5); //DOUBLE CHECK
+    move_forward(percent, counts);
+
+}
+
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -512,105 +686,10 @@ void ERCMain()
     arm_servo.SetMin(servo_min);
     arm_servo.SetMax(servo_max);
 
-    //initialize the RCS
-    RCS.InitializeTouchMenu("1130D8HDL");
 
-    //read start light
-    read_start();
-    LCD.Write(CdS_cell.Value());
-    LCD.Write("cds");
+    start_protocol(percent, counts);
 
-    //reset arm servo
-    arm_servo.SetDegree(0);
-    LCD.Write("  servo");
 
-    //back into start button
-    counts = (CPI*1.5);
-    percent = -drive_power/2;
-    move_forward(percent, counts);
-    LCD.Write("  start button");
-
-    Sleep(0.25);
-    LCD.Write("  sleep");
-
-    //drive forward for 9
-    percent = turn_power;
-    counts = (CPI*10);
-    move_forward(percent, counts);
-
-    //turn 45 about left wheel
-    percent = turn_power;
-    counts = (CPI*2*TR*2*pi/8);
-    turn_about_left(percent, counts);
-
-    //drive forward into wall
-    percent = turn_power;
-    counts = (CPI*14);
-    move_forward(percent, counts);
-
-    //drive backwards 1 to prep for turn
-    percent = -drive_power;
-    counts = (CPI*1);
-    move_forward(percent, counts);
-
-    //90 degrees counterclockwise about center
-    percent = turn_power;
-    counts = (CPI*TR*2*pi/3.75);
-    turn_counterclockwise_center(percent, counts);
-
-    //drive forward into robot and keep motors moving
-    percent = turn_power/2;
-    right_motor.SetPercent(percent);
-    left_motor.SetPercent(percent);
-
-    //turn on wheel servo forward
-    wheel_servo.SetDegree(70);
-    Sleep(1.5);
-
-    //pause for a bit
-    wheel_servo.SetDegree(90);
-    Sleep(1.5); 
-
-    //turn wheel servo backwards
-    wheel_servo.SetDegree(105);
-    Sleep(1.5);
-
-    //stop wheel servo
-    wheel_servo.SetDegree(90);
-
-    //stop motors and run drive sequence backwards
-    right_motor.Stop();
-    left_motor.Stop();
-
-    //drive backwards from bin to make turn
-    percent = turn_power;
-    counts = (CPI*3);
-    move_forward(percent, counts);
-
-    //90 degrees clockwise about center
-    percent = -turn_power;
-    counts = (CPI*TR*2*pi/4);
-    turn_counterclockwise_center(percent, counts);
-
-    //drive forwards into wall to align
-    percent = turn_power;
-    counts = (CPI*4);
-    move_forward(percent, counts);
-
-    //drive backward to starting zone
-    percent = -turn_power;
-    counts = (CPI*21);
-    move_forward(percent, counts);
-
-     //turn backwards 45 about left wheel
-    percent = -turn_power;
-    counts = (CPI*2*TR*2*pi/8);
-    turn_about_left(percent, counts);
-
-    //drive backwards into start button
-    percent = -turn_power;
-    counts = (CPI*12);
-    move_forward(percent, counts);
 
 
 
