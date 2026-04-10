@@ -319,7 +319,25 @@ void follow_line_counts (int percent, int counts)
 
     while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
     {
-       if((right_opto.Value() >= 4.2))
+        if ((left_opto.Value() <= 2.5) && (center_opto.Value() <=2.5) && (right_opto.Value() < 2.5))
+        {
+        right_motor.Stop();
+        left_motor.Stop();
+        Sleep(0.5);
+        LCD.Write("  STOP: All White");
+        break;
+        }
+
+        else if ((left_opto.Value() > 4.2) && (center_opto.Value() > 4.2) && (right_opto.Value() > 4.2))
+        {
+        right_motor.Stop();
+        left_motor.Stop();
+        Sleep(0.5);
+        LCD.Write("  STOP: All Black");
+        break;
+        }
+
+        else if((right_opto.Value() >= 4.2))
         {
         right_motor.SetPercent(-(percent+5));
         left_motor.SetPercent(percent);
@@ -337,14 +355,7 @@ void follow_line_counts (int percent, int counts)
         left_motor.SetPercent(percent);
         }
 
-        else if ((left_opto.Value() <= 2.5) && (center_opto.Value() <=2.5) && (right_opto.Value() < 2.5))
-        {
-        right_motor.Stop();
-        left_motor.Stop();
-        Sleep(0.5);
-        LCD.Write("STOP: All White");
-        break;
-        }
+        
     }
     
     right_motor.Stop();
@@ -442,10 +453,9 @@ arm_servo.SetDegree(0);
 
 
 //decision program for navigating to levers
-void choose_lever()
+void choose_lever(int percent, int counts)
 {
     int lever_choice = RCS.GetLever();
-    int percent, counts;
 
     if(lever_choice == 0)
     {
@@ -607,23 +617,28 @@ void apple_basket(int percent, int counts, int i, int target_angle)
     /////UPPER LEVEL/////
     /////////////////////
 
-    // // XXXXX make manual 45 degree turn XXXXX
+    //90 degree at curved junction
     percent = turn_power;
-    counts = (full_turn_about/8);
+    counts = (full_turn_center/4);
     turn_counterclockwise_center(percent, counts);
-    LCD.Write("  45 for line");
+    LCD.Write("  90 degrees");
 
-    //drive forward to try and catch line 
+    //forward to bin/button junction
     percent = turn_power;
-    counts = (CPI*6);
+    counts = (CPI*4);
     move_forward(percent, counts);
-    LCD.Write("forward to line");
+
+    //90 at bin/button
+    percent = -turn_power;
+    counts = (full_turn_center/4);
+    turn_counterclockwise_center(percent, counts);
+    LCD.Write("  90 degrees");
 
     //follow line to apple crate
     percent = turn_power;
     counts = (CPI*19);
     follow_line_counts(percent, counts);
-    LCD.Write("caught line");
+    LCD.Write("  caught line");
 
     //align on crate
     percent = turn_power; 
@@ -635,8 +650,9 @@ void apple_basket(int percent, int counts, int i, int target_angle)
     move_forward(percent, counts);
 
     //lower basket into crate (down 30 degrees, get to 80 degrees)
-   target_angle = 80;
-   arm_servo_down(i, target_angle);
+    target_angle = 80;
+    arm_servo_down(i, target_angle);
+    LCD.Write("  lower arm");
 
     //back arm out of basket
     percent = -turn_power;
@@ -646,11 +662,13 @@ void apple_basket(int percent, int counts, int i, int target_angle)
     //raise arm back up to top
     target_angle = 0;
     arm_servo_up(i, target_angle);
+    LCD.Write("  raise");
 
-    //follow line backwards to turn junction
+    //navigate back to bin/button junction
     percent = -turn_power;
     counts = (CPI*17.5); //DOUBLE CHECK
     move_forward(percent, counts);
+    LCD.Write("  bin/button");
 
 }
 
@@ -688,6 +706,10 @@ void ERCMain()
 
 
     start_protocol(percent, counts);
+
+    apple_basket(percent, counts, i, target_angle);
+
+    choose_lever(percent, counts);
 
 
 
