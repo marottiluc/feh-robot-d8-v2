@@ -561,108 +561,145 @@ void apple_compost(int percent, int counts, int i, int target_angle)
     turn_counterclockwise_center(percent, counts);
     LCD.Write("  90 deg");
 
+    //forward to get past apple basket 
+    percent = turn_power;
+    counts = (CPI*6); //test and modify
+    move_forward(percent, counts);
+
+    //45 degree about left 
+    percent = turn_power;
+    counts = (full_turn_about/8);
+    turn_about_left(percent, counts);
+    LCD.Write("  45 degL");
+
+    //45 degree about right 
+    percent = turn_power;
+    counts = (full_turn_about/8);
+    turn_about_right(percent, counts);
+    LCD.Write("  45 degR");
+
+    //continue forward to interface
+    percent = turn_power;
+    counts = (CPI*6); //test and modify
+    move_forward(percent, counts);
+
+    //drive forward into robot and keep motors moving
+    percent = turn_power/2;
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent);
+
+    //turn on wheel servo forward
+    wheel_servo.SetDegree(70);
+    Sleep(3.0);
+    LCD.Write("  bin forward");
+
+    //pause for a bit
+    wheel_servo.SetDegree(95);
+    Sleep(1.5); 
+    LCD.Write("  bin stop");
+
+    //turn wheel servo backwards
+    wheel_servo.SetDegree(110);
+    LCD.Write("  bin backward");
+    Sleep(1.5);
+
+    //stop wheel servo
+    wheel_servo.Off();
+
+    //stop motors and run drive sequence backwards
+    right_motor.Stop();
+    left_motor.Stop();
+
+    //drive backwards from bin to make turn
+    percent = turn_power;
+    counts = (CPI*3);
+    move_forward(percent, counts);
+
+    //90 degrees clockwise about center
+    percent = -turn_power;
+    counts = (CPI*TR*2*pi/4);
+    turn_counterclockwise_center(percent, counts);
+
+    //drive forwards into wall to align
+    percent = turn_power;
+    counts = (CPI*4);
+    move_forward(percent, counts);
+
+    //drive backward to starting zone
+    percent = -turn_power;
+    counts = (CPI*25); //test and modify
+    move_forward(percent, counts);
 
 
+}
 
+void apple_nav (int percent, int counts, int i, int target_angle)
+{
 
-    // //45 degree about left (backwards)
-    // percent = -turn_power;
-    // counts = (full_turn_about/8);
-    // turn_about_left(percent, counts);
-    // LCD.Write("  45 deg");
+    //90 degrees backwards about right
+    percent = -turn_power;
+    counts = (full_turn_about/4);
+    turn_about_right(percent, counts);
 
-    // //backwards for spacing
-    // percent = -turn_power;
-    // counts = (CPI*5);
-    // move_forward(percent, counts);
-    // LCD.Write("  spacing");
+    //move up ramp and try to catch line
+    percent = turn_power;
+    counts = (CPI*24);
+    move_forward(percent, counts);
 
-    
-    // //45 degree about right (backwards)
-    // percent = -turn_power;
-    // counts = (full_turn_about/8);
-    // turn_about_right(percent, counts);
-    // LCD.Write("  45 deg");
+    //follow along line until 90 degree turn
+    percent = turn_power;
+    counts = (CPI*4);
+    follow_line_counts(percent, counts);
 
-    // //backwards to hit wall
-    // percent = -turn_power;
-    // counts = (CPI*20);
-    // move_forward(percent, counts);
+    //90 degrees counterclockwise (manual)
+    percent = turn_power;
+    counts = (full_turn_center/4);
+    turn_counterclockwise_center(percent, counts);
 
-    // //forwards for ramp
-    // percent = turn_power;
-    // counts = (CPI*1);
-    // move_forward(percent, counts);
+    //follow along line until 90 degree turn
+    percent = turn_power;
+    counts = (CPI*4);
+    follow_line_counts(percent, counts);
 
-    // //90 degrees about right
-    // percent = turn_power;
-    // counts = (full_turn_about/3.5);
-    // turn_about_right(percent, counts);
-    // LCD.Write("90 deg");
+    //90 degrees clockwise (manual)
+    percent = -turn_power;
+    counts = (full_turn_center/4);
+    turn_counterclockwise_center(percent, counts);
 
-    // //drive up ramp and catch line
-    // counts = (CPI*22); //DOUBLE CHECK
-    // percent = drive_power;
-    // move_forward(percent, counts);
-    // LCD.Write("  up ramp");
+    //follow line to apple crate
+    percent = turn_power;
+    counts = (CPI*19); //test and modify
+    follow_line_counts(percent, counts);
+    LCD.Write("caught line");
 
+    //align on crate
+    percent = turn_power; 
+    counts = (CPI*2);
+    move_forward(percent, counts);
 
-    // /////////////////////
-    // /////UPPER LEVEL/////
-    // /////////////////////
+    //back out slightly so basket does not hit back of crate
+    percent = -turn_power; 
+    counts = (CPI*0.25);
+    move_forward(percent, counts);
 
-    // //90 degree at curved junction
-    // percent = turn_power;
-    // counts = (full_turn_center/4);
-    // turn_counterclockwise_center(percent, counts);
-    // LCD.Write("  90 degrees");
+    //lower basket into crate (down 30 degrees, get to 80 degrees)
+    target_angle = 80;
+    arm_servo_down(i, target_angle);
 
-    // //forward to bin/button junction
-    // percent = turn_power;
-    // counts = (CPI*4);
-    // move_forward(percent, counts);
+    //back arm out of basket
+    percent = -turn_power;
+    counts = (CPI*3);
+    move_forward(percent, counts);
 
-    // //90 at bin/button
-    // percent = -turn_power;
-    // counts = (full_turn_center/4);
-    // turn_counterclockwise_center(percent, counts);
-    // LCD.Write("  90 degrees");
+    //raise arm back up to top
+    target_angle = 0;
+    arm_servo_up(i, target_angle);
 
-    // //follow line to apple crate
-    // percent = turn_power;
-    // counts = (CPI*19);
-    // follow_line_counts(percent, counts);
-    // LCD.Write("  caught line");
+    //follow line backwards to turn junction
+    percent = -turn_power;
+    counts = (CPI*17.5); //DOUBLE CHECK
+    move_forward(percent, counts);
 
-    // //align on crate
-    // percent = turn_power; 
-    // counts = (CPI*2);
-    // move_forward(percent, counts);
-
-    // percent = -turn_power; //back out slightly so basket does not hit back of crate
-    // counts = (CPI*0.25);
-    // move_forward(percent, counts);
-
-    // //lower basket into crate (down 30 degrees, get to 80 degrees)
-    // target_angle = 80;
-    // arm_servo_down(i, target_angle);
-    // LCD.Write("  lower arm");
-
-    // //back arm out of basket
-    // percent = -turn_power;
-    // counts = (CPI*3);
-    // move_forward(percent, counts);
-
-    // //raise arm back up to top
-    // target_angle = 0;
-    // arm_servo_up(i, target_angle);
-    // LCD.Write("  raise");
-
-    // //navigate back to bin/button junction
-    // percent = -turn_power;
-    // counts = (CPI*17.5); //DOUBLE CHECK
-    // move_forward(percent, counts);
-    // LCD.Write("  bin/button");
 
 }
 
