@@ -297,10 +297,11 @@ void follow_line (int percent)
 
 void follow_line_counts (int percent, int counts)
 {
+    float time_start = TimeNow();
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
 
-    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
+    while(((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts) && ((TimeNow() - time_start) <= 5))
     {
         if ((left_opto.Value() <= 2.5) && (center_opto.Value() <=2.5) && (right_opto.Value() < 2.5))
         {
@@ -360,34 +361,47 @@ void left_lever(int percent, int counts)
 //put lever down
 
 percent = turn_power;
-counts = (CPI*TR*2*pi/8);
+counts = (full_turn_center/8);
 turn_counterclockwise_center(percent, counts);
 
 counts = (CPI*11);
 move_forward(percent, counts);
-counts = (CPI*TR*2*pi/4);
+
+counts = (full_turn_center/4);
 turn_counterclockwise_center(percent, counts);
-counts = (CPI*5);
+
+counts = (CPI*4);
 move_forward(percent, counts);
-counts = (CPI*TR*2*pi/4);
+
+counts = (full_turn_center/4);
 turn_counterclockwise_center(-percent, counts);
-follow_line(percent);
 
+counts = (CPI*4);
+follow_line_counts(percent, counts);
 
-arm_servo.SetDegree(0);
-Sleep(1.0);
-
-counts = (CPI*.5);
-move_forward(-percent, counts);
-arm_servo.SetDegree(60);
+counts = (CPI*0.5);
 move_forward(percent,counts);
+
+arm_servo.SetDegree(60); //for loop later
+
+Sleep(1.5);
+
 arm_servo.SetDegree(0);
+
+counts = (CPI*3.5);
+move_forward(-percent,counts);
 
 Sleep(5.0);
 
-    arm_servo.SetDegree(0);
-    move_forward(percent,counts);
-    arm_servo.SetDegree(60);
+arm_servo.SetDegree(90);
+
+Sleep(1.0);
+move_forward(percent,counts);
+Sleep(1.0);
+
+arm_servo.SetDegree(60);
+
+
 
 }
 
@@ -395,26 +409,38 @@ Sleep(5.0);
 void center_lever(int percent, int counts)
 {
 percent = turn_power;
-counts = (CPI*TR*2*pi/8);
+counts = (full_turn_center/8);
 turn_counterclockwise_center(percent, counts);
 
 arm_servo.SetDegree(0);
     Sleep(1.0);
 
-counts = (CPI*15); //measured
+counts = (CPI*12); //measured
 move_forward(percent, counts);
-follow_line(percent);
 
-counts = (CPI*.5);
-move_forward(-percent, counts);
-arm_servo.SetDegree(60);
+counts = (CPI*4);
+follow_line_counts(percent, counts);
+
+counts = (CPI*0.5);
 move_forward(percent,counts);
+
+arm_servo.SetDegree(60); //for loop later
+
+Sleep(1.5);
+
 arm_servo.SetDegree(0);
+
+counts = (CPI*3.5);
+move_forward(-percent,counts);
 
 Sleep(5.0);
 
-arm_servo.SetDegree(0);
+arm_servo.SetDegree(90);
+
+Sleep(1.0);
 move_forward(percent,counts);
+Sleep(1.0);
+
 arm_servo.SetDegree(60);
 
 
@@ -426,8 +452,8 @@ arm_servo.SetDegree(60);
 void right_lever(int percent, int counts)
 {
     //turn 45 degrees
-    percent = percent;
-    counts = (CPI*TR*2*pi/8);
+    percent = turn_power;
+    counts = (full_turn_center/8);
     turn_counterclockwise_center(percent, counts);
 
     //move 5 inches to center line
@@ -435,10 +461,10 @@ void right_lever(int percent, int counts)
     move_forward(percent, counts);
 
     //turn 90 degrees
-    counts = (CPI*TR*2*pi/4);
+    counts = (full_turn_center/4);
     turn_counterclockwise_center(-percent, counts);
     // move one inch
-    counts = (CPI*5);
+    counts = (CPI*4);
     move_forward(percent, counts);
 
     //set servo up
@@ -446,24 +472,33 @@ void right_lever(int percent, int counts)
     Sleep(1.0);
 
     //move 90 degrees the other way
-    counts = (CPI*TR*2*pi/4);
+    counts = (full_turn_center/4);
     turn_counterclockwise_center(percent, counts);
-    follow_line(percent);
 
-   
+counts = (CPI*4);
+follow_line_counts(percent, counts);
 
-    //move half an inch back
-    counts = (CPI*.5);
-    move_forward(-percent, counts);
-    arm_servo.SetDegree(60);
-    move_forward(percent,counts);
-    arm_servo.SetDegree(0);
+counts = (CPI*0.5);
+move_forward(percent,counts);
 
-    Sleep(5.0);
+arm_servo.SetDegree(60); //for loop later
 
-    arm_servo.SetDegree(0);
-    move_forward(percent,counts);
-    arm_servo.SetDegree(60);
+Sleep(1.5);
+
+arm_servo.SetDegree(0);
+
+counts = (CPI*3.5);
+move_forward(-percent,counts);
+
+Sleep(5.0);
+
+arm_servo.SetDegree(90);
+
+Sleep(1.0);
+move_forward(percent,counts);
+Sleep(1.0);
+
+arm_servo.SetDegree(60);
 
 
 }
@@ -527,7 +562,7 @@ void start_protocol (int percent, int counts)
     LCD.Write("  servo");
 
     //back into start button
-    counts = (CPI*1.5);
+    counts = (CPI*1);
     percent = -drive_power/2;
     move_forward(percent, counts);
     LCD.Write("  start button");
@@ -561,7 +596,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     //90 degrees about left
     percent = turn_power;
-    counts = (full_turn_about/3.9);
+    counts = (full_turn_about/3.8);
     turn_about_left(percent, counts);
     LCD.Write("  90 deg");
 
@@ -578,7 +613,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     //drive into basket to grab
     percent = turn_power;
-    counts = (CPI*1.25);
+    counts = (CPI*1.75);
     move_forward(percent, counts);
     LCD.Write("  grab basket");
     Sleep(1.0);
@@ -630,7 +665,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     //turn on wheel servo forward
     wheel_servo.SetDegree(70);
-    Sleep(3.0);
+    Sleep(2.25);
     LCD.Write("  bin forward");
 
     //pause for a bit
@@ -711,7 +746,7 @@ void apple_nav (int percent, int counts, int i, int target_angle)
 
     //align on crate
     percent = turn_power; 
-    counts = (CPI*4);
+    counts = (CPI*2);
     move_forward(percent, counts);
 
     // //back out slightly so basket does not hit back of crate
@@ -740,8 +775,8 @@ void apple_nav (int percent, int counts, int i, int target_angle)
 
     //move backwards to turn junction
     percent = -turn_power;
-    counts = (CPI*14); //DOUBLE CHECK
-    move_forward(percent, counts);
+    counts = (CPI*12.5); //DOUBLE CHECK
+    follow_line_counts(percent, counts);
 
 
 }
@@ -808,13 +843,13 @@ void ERCMain()
     wheel_servo.SetMin(1200);
     wheel_servo.SetMax(1650);
 
-    // //initialize the RCS
-    // RCS.InitializeTouchMenu("1130D8HDL");
+    //initialize the RCS
+    RCS.InitializeTouchMenu("1130D8HDL");
 
-    // //read start light
-    // read_start();
-    // LCD.Write(CdS_cell.Value());
-    // LCD.Write("cds");
+    //read start light
+    read_start();
+    LCD.Write(CdS_cell.Value());
+    LCD.Write("cds");
 
     //reset arm servo
     arm_servo.SetDegree(0);
@@ -832,6 +867,8 @@ void ERCMain()
     apple_compost(percent, counts, i , target_angle);
 
     apple_nav(percent, counts, i ,target_angle);
+
+    choose_lever(percent, counts);
 
 
 
