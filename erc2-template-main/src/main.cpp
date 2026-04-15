@@ -17,7 +17,7 @@
 #define full_turn_about  (CPI*2*TR*2*pi)
 
 //Declarations for encoders & motors
-//left and right as view from the front 
+//left and right as view from the front
 DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 FEHMotor right_motor(FEHMotor::Motor0, 9.0);
@@ -29,6 +29,8 @@ FEHServo window_servo(FEHServo::Servo2);
 AnalogInputPin left_opto(FEHIO::Pin4);
 AnalogInputPin center_opto(FEHIO::Pin6);
 AnalogInputPin right_opto(FEHIO::Pin7);
+
+//int state = 0;
 
 void move_forward(int percent, int counts) //using encoders
 {
@@ -149,7 +151,7 @@ while((TimeNow() - time_start) <= 30)
 }
 }
 
-void blue_button(int percent, int counts) 
+void blue_button(int percent, int counts)
 {
     LCD.Clear();
     LCD.Write("BLUE");
@@ -237,7 +239,7 @@ while((TimeNow() - time_start) <= 10)
         break;
     }
 
-    else 
+    else
     {
         blue_button(percent, counts);
         break;
@@ -338,10 +340,14 @@ void follow_line_counts (int percent, int counts)
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
         }
-
-        
+       
+       
     }
-    
+   
+    // if ((TimeNow() - time_start) <= 5)
+    // {
+    //     state = 0;
+    // }
     right_motor.Stop();
     left_motor.Stop();
 
@@ -376,8 +382,8 @@ move_forward(percent, counts);
 counts = (full_turn_center/4);
 turn_counterclockwise_center(-percent, counts);
 
-counts = (CPI*4);
-follow_line_counts(percent, counts);
+counts = (CPI*.5); //changed
+move_forward(percent, counts);
 
 counts = (CPI*0.5);
 move_forward(percent,counts);
@@ -461,7 +467,7 @@ void right_lever(int percent, int counts)
     move_forward(percent, counts);
 
     //turn 90 degrees
-    counts = (full_turn_center/4);
+    counts = (full_turn_center/4+5);
     turn_counterclockwise_center(-percent, counts);
     // move one inch
     counts = (CPI*4);
@@ -475,8 +481,8 @@ void right_lever(int percent, int counts)
     counts = (full_turn_center/4);
     turn_counterclockwise_center(percent, counts);
 
-counts = (CPI*4);
-follow_line_counts(percent, counts);
+counts = (CPI*.5); //changed
+move_forward(percent, counts);
 
 counts = (CPI*0.5);
 move_forward(percent,counts);
@@ -494,9 +500,9 @@ Sleep(5.0);
 
 arm_servo.SetDegree(90);
 
-Sleep(1.0);
+//Sleep(1.0);
 move_forward(percent,counts);
-Sleep(1.0);
+//Sleep(1.0);
 
 arm_servo.SetDegree(60);
 
@@ -526,7 +532,7 @@ void choose_lever(int percent, int counts)
 
 }
 
-void arm_servo_up (int i, int target_angle) //for raising the arm 
+void arm_servo_up (int i, int target_angle) //for raising the arm
 {
   for(i; i<target_angle; i++){
         arm_servo.SetDegree(i);
@@ -535,7 +541,7 @@ void arm_servo_up (int i, int target_angle) //for raising the arm
 
 }
 
-void arm_servo_down (int i, int target_angle) //for lowering the arm 
+void arm_servo_down (int i, int target_angle) //for lowering the arm
 {
   for(i; i>target_angle; i--){
         arm_servo.SetDegree(i);
@@ -607,7 +613,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     // //follow line until turn
     // percent = turn_power;
-    // counts = (CPI*3); 
+    // counts = (CPI*3);
     // move_forward(percent, counts); //changed to manual
     // LCD.Write("  follow");
 
@@ -638,7 +644,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
     turn_counterclockwise_center(percent, counts);
     LCD.Write("  90 deg");
 
-    //forward to get past apple basket 
+    //forward to get past apple basket
     percent = turn_power;
     counts = (CPI*1); //test and modify
     move_forward(percent, counts);
@@ -648,7 +654,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
     counts = (full_turn_about/5.5);
     turn_about_right(percent, counts);
 
-    //forward to get past apple basket 
+    //forward to get past apple basket
     percent = turn_power;
     counts = (CPI*2.5); //test and modify
     move_forward(percent, counts);
@@ -670,7 +676,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     //pause for a bit
     wheel_servo.SetDegree(95);
-    Sleep(0.5); 
+    Sleep(0.5);
     LCD.Write("  bin stop");
 
     //turn wheel servo backwards
@@ -718,10 +724,26 @@ void apple_nav (int percent, int counts, int i, int target_angle)
     counts = (CPI*24);
     move_forward(percent, counts);
 
+   
+
+
     //follow along line until 90 degree turn
     percent = turn_power;
     counts = (CPI*5); //test and modify
-    follow_line_counts(percent, counts); 
+    follow_line_counts(percent, counts);
+
+    // if(state == 0)
+    // {
+    //     state = 1;
+    //     percent = turn_power;
+    //     counts = (full_turn_center/24);
+    //     turn_counterclockwise_center(-percent, counts);
+    //     //follow along line until 90 degree turn
+    //     percent = turn_power;
+    //     counts = (CPI*5); //test and modify
+    //     follow_line_counts(percent, counts);
+    // }
+    // state = 1;
 
     //90 degrees counterclockwise (manual)
     percent = turn_power;
@@ -731,7 +753,7 @@ void apple_nav (int percent, int counts, int i, int target_angle)
     //move along line until line
     percent = turn_power;
     counts = (CPI*7); //test and modify
-    move_forward(percent, counts); 
+    move_forward(percent, counts);
 
     //45 degrees clockwise (manual)
     percent = -turn_power;
@@ -745,12 +767,12 @@ void apple_nav (int percent, int counts, int i, int target_angle)
     LCD.Write("caught line");
 
     //align on crate
-    percent = turn_power; 
+    percent = turn_power;
     counts = (CPI*2);
     move_forward(percent, counts);
 
     // //back out slightly so basket does not hit back of crate
-    // percent = -turn_power; 
+    // percent = -turn_power;
     // counts = (CPI*0.25);
     // move_forward(percent, counts);
 
@@ -773,10 +795,10 @@ void apple_nav (int percent, int counts, int i, int target_angle)
     }
     LCD.Write("raise arm");
 
-    //move backwards to turn junction
+    //follow line backwards to turn junction
     percent = -turn_power;
-    counts = (CPI*12.5); //DOUBLE CHECK
-    follow_line_counts(percent, counts);
+    counts = (CPI*11.5); //DOUBLE CHECK
+    move_forward(percent, counts);
 
 
 }
