@@ -151,36 +151,48 @@ while((TimeNow() - time_start) <= 30)
 }
 }
 
+//new with backwards
 void blue_button(int percent, int counts)
 {
     LCD.Clear();
     LCD.Write("BLUE");
 
+    //turn 180 degrees
+    percent = turn_power;
+    counts = (full_turn_center/2);
+    turn_counterclockwise_center(percent, counts);
+
     //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
     percent = turn_power;
     counts = full_turn_about/4;
-    turn_about_left(percent, counts);
+    //turn_about_left(percent, counts);
+    turn_about_right(-percent,counts);
 
     //drive forward to be aligned on button (CPI*distance)
     percent = turn_power;
     counts = CPI*1;
-    move_forward(percent, counts);
+   // move_forward(percent, counts);
+    move_forward(-percent, counts);
 
     percent = turn_power;
     counts = full_turn_about/4;
-    turn_about_right(percent, counts);
+    //turn_about_right(percent, counts);
+    turn_about_left(-percent, counts);
 
     percent = turn_power;
     counts = CPI*0.5;
-    move_forward(percent, counts);
+    //move_forward(percent, counts);
+    move_forward(-percent, counts);
 
     percent = drive_power;
     counts = CPI*0.5;
-    move_forward(percent, counts);
+    //move_forward(percent, counts);
+    move_forward(-percent, counts);
 
     percent = -drive_power;
     counts = CPI*6;
-    move_forward(percent, counts);
+    //move_forward(percent, counts);
+    move_forward(-percent, counts);
 
 
 }
@@ -191,31 +203,43 @@ void red_button(int percent, int counts)
     LCD.Clear();
     LCD.Write("RED");
 
+
+    //turn 180 degrees
+    percent = turn_power;
+    counts = (full_turn_center/2);
+    turn_counterclockwise_center(percent, counts);
+
     //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
     percent = turn_power;
     counts = (full_turn_about/4);
-    turn_about_right(percent, counts);
+    // turn_about_right(percent, counts);
+    turn_about_left(-percent, counts);
 
     //drive forward to be aligned on button (CPI*distance)
     percent = turn_power;
     counts = CPI*1;
-    move_forward(percent, counts);
+    // move_forward(percent, counts);
+    move_forward(-percent, counts);
 
     percent = turn_power;
     counts = full_turn_about/4;
-    turn_about_left(percent, counts);
+    // turn_about_left(percent, counts);
+    turn_about_right(-percent, counts);
 
     percent = turn_power;
     counts = CPI*0.5;
-    move_forward(percent, counts);
+    // move_forward(percent, counts);
+    move_forward(-percent, counts);
 
     percent = drive_power;
     counts = CPI*0.5;
-    move_forward(percent, counts);
+    // move_forward(percent, counts);
+     move_forward(-percent, counts);
 
     percent = -drive_power;
     counts = CPI*6;
-    move_forward(percent, counts);
+    // move_forward(percent, counts);
+    move_forward(-percent, counts);
 
 
 }
@@ -247,6 +271,34 @@ while((TimeNow() - time_start) <= 10)
 
 
 }
+}
+
+void buttons (int percent, int counts)
+{
+
+    //90 degrees counterclockwise
+    percent = turn_power;
+    counts = (full_turn_center/4);
+    turn_counterclockwise_center(percent, counts);
+
+    //follow w counts til end of line
+    percent = turn_power;
+    counts = (CPI*9); //test and modify
+    follow_line_counts(percent, counts);
+
+    //pause for a second to make me feel better about this
+    Sleep(0.5);
+
+    //move forward just enough to be over CdS cell
+    percent = turn_power/2;
+    counts = (CPI*1); //test and modify
+    move_forward(percent, counts);
+
+    //read color and continue on needed path
+    read_color(percent, counts);
+
+
+
 }
 
 
@@ -370,7 +422,7 @@ percent = turn_power;
 counts = (full_turn_center/8);
 turn_counterclockwise_center(percent, counts);
 
-counts = (CPI*11);
+counts = (CPI*10.75);
 move_forward(percent, counts);
 
 counts = (full_turn_center/4);
@@ -415,17 +467,17 @@ arm_servo.SetDegree(60);
 void center_lever(int percent, int counts)
 {
 percent = turn_power;
-counts = (full_turn_center/8);
+counts = (full_turn_center/7.8);
 turn_counterclockwise_center(percent, counts);
 
 arm_servo.SetDegree(0);
     Sleep(1.0);
 
-counts = (CPI*12); //measured
+counts = (CPI*8.75); //measured
 move_forward(percent, counts);
 
 counts = (CPI*4);
-follow_line_counts(percent, counts);
+move_forward(percent, counts);
 
 counts = (CPI*0.5);
 move_forward(percent,counts);
@@ -455,6 +507,7 @@ arm_servo.SetDegree(60);
 
 
 //protocol for navigating to the right lever
+//potentially reorder to have orienting turns first, then drive
 void right_lever(int percent, int counts)
 {
     //turn 45 degrees
@@ -463,7 +516,7 @@ void right_lever(int percent, int counts)
     turn_counterclockwise_center(percent, counts);
 
     //move 5 inches to center line
-    counts = (CPI*11);
+    counts = (CPI*10.75);
     move_forward(percent, counts);
 
     //turn 90 degrees
@@ -568,7 +621,7 @@ void start_protocol (int percent, int counts)
     LCD.Write("  servo");
 
     //back into start button
-    counts = (CPI*1);
+    counts = (CPI*0.5);
     percent = -drive_power/2;
     move_forward(percent, counts);
     LCD.Write("  start button");
@@ -583,7 +636,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     //drive straight forward and look for line
     percent = turn_power;
-    counts = (CPI*14);
+    counts = (CPI*13.75);
     move_forward(percent, counts);
     LCD.Write("  drive");
 
@@ -602,7 +655,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     //90 degrees about left
     percent = turn_power;
-    counts = (full_turn_about/3.8);
+    counts = (full_turn_about/3.7);
     turn_about_left(percent, counts);
     LCD.Write("  90 deg");
 
@@ -695,18 +748,24 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     //drive backwards from bin to make turn
     percent = -turn_power;
-    counts = (CPI*1);
+    counts = (CPI*3);
     move_forward(percent, counts);
 
     //90 degrees clockwise about center
-    percent = turn_power;
-    counts = (full_turn_center/3.5);
+    percent = -turn_power;
+    counts = (full_turn_center/3.8);
     turn_counterclockwise_center(percent, counts);
 
-    //drive forward to starting zone
-    percent = drive_power;
-    counts = (CPI*22.5); //test and modify
+    //drive backward to starting zone
+    percent = -drive_power;
+    counts = (CPI*25); //test and modify
     move_forward(percent, counts);
+
+    //slow down!
+    percent = -(turn_power+5);
+    counts = (CPI*4);
+    move_forward(percent, counts);
+    Sleep(1.5);
 
 
 }
@@ -714,18 +773,20 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 void apple_nav (int percent, int counts, int i, int target_angle)
 {
 
-    //90 degrees counterclockwise about center
+    //forward 0.5 in off wall
     percent = turn_power;
-    counts = (full_turn_center/3.7);
-    turn_counterclockwise_center(percent, counts);
+    counts = (CPI*0.5);
+    move_forward(percent, counts);
+
+    //90 degrees clockwise about right
+    percent = turn_power;
+    counts = (full_turn_about/3.6);
+    turn_about_right(percent, counts);
 
     //move up ramp and try to catch line
     percent = drive_power-10;
-    counts = (CPI*24);
+    counts = (CPI*17);
     move_forward(percent, counts);
-
-   
-
 
     //follow along line until 90 degree turn
     percent = turn_power;
@@ -762,7 +823,7 @@ void apple_nav (int percent, int counts, int i, int target_angle)
 
     //follow line to apple crate
     percent = turn_power;
-    counts = (CPI*13); //test and modify
+    counts = (CPI*14); //test and modify
     follow_line_counts(percent, counts);
     LCD.Write("caught line");
 
