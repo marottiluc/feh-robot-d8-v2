@@ -169,11 +169,11 @@ void blue_button(int percent, int counts)
     //turn_about_left(percent, counts);
     turn_about_right(-percent,counts);
 
-    //drive forward to be aligned on button (CPI*distance)
-    percent = turn_power;
-    counts = CPI*3;
-   // move_forward(percent, counts);
-    move_forward(-percent, counts);
+//     //drive forward to be aligned on button (CPI*distance)
+//     percent = turn_power;
+//     counts = CPI*3;
+//    // move_forward(percent, counts);
+//     move_forward(-percent, counts);
 
     Sleep(1.0);
 
@@ -181,16 +181,6 @@ void blue_button(int percent, int counts)
     counts = full_turn_about/6;
     //turn_about_right(percent, counts);
     turn_about_left(-percent, counts);
-
-    // percent = turn_power;
-    // counts = CPI*0.5;
-    // //move_forward(percent, counts);
-    // move_forward(-percent, counts);
-
-    // percent = drive_power;
-    // counts = CPI*0.5;
-    // //move_forward(percent, counts);
-    // move_forward(-percent, counts);
 
     counts = (CPI*2);
     move_forward(percent, counts);
@@ -228,11 +218,11 @@ void red_button(int percent, int counts)
     // turn_about_right(percent, counts);
     turn_about_left(-percent, counts);
 
-    //drive forward to be aligned on button (CPI*distance)
-    percent = turn_power;
-    counts = CPI*3;
-    // move_forward(percent, counts);
-    move_forward(-percent, counts);
+    // //drive forward to be aligned on button (CPI*distance)
+    // percent = turn_power;
+    // counts = CPI*3;
+    // // move_forward(percent, counts);
+    // move_forward(-percent, counts);
 
     percent = turn_power;
     counts = full_turn_about/6;
@@ -264,7 +254,7 @@ void cds_check(int percent, int counts)
 int check = 0;
 float value;
 percent = turn_power/2;
-counts = (CPI*0.25);
+counts = (CPI*0.5);
 
 //if value is red, add to counter
 value = CdS_cell.Value();
@@ -272,21 +262,28 @@ if (value < 0.5) {check += 1;}
 
 //change position and take reading again
 move_forward(percent, counts);
-
-value = CdS_cell.Value();
-if (value < 0.5) {check += 1;}
-
-move_forward(-percent, counts);
-
-value = CdS_cell.Value();
-if (value < 0.5) {check += 1;}
-
-move_forward(-percent, counts);
+Sleep(0.75);
 
 value = CdS_cell.Value();
 if (value < 0.5) {check += 1;}
 
 move_forward(percent, counts);
+Sleep(0.75);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.75);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.75);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
 
 if(check != 0)
 {red_button(percent, counts);}
@@ -850,7 +847,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     //90 degrees clockwise about center
     percent = -turn_power;
-    counts = (full_turn_center/3.8);
+    counts = (full_turn_center/3.7);
     turn_counterclockwise_center(percent, counts);
 
     //drive backward to starting zone
@@ -859,8 +856,8 @@ void apple_compost(int percent, int counts, int i, int target_angle)
     move_forward(percent, counts);
 
     //slow down!
-    percent = -(turn_power+5);
-    counts = (CPI*4);
+    percent = -(turn_power);
+    counts = (CPI*6);
     move_forward(percent, counts);
     Sleep(1.5);
 
@@ -1019,7 +1016,7 @@ void humider_button(int percent, int counts)
 
     Sleep(1.5);
 
-    counts = (CPI*6);
+    counts = (CPI*4);
     move_forward(percent,counts);
 
    
@@ -1062,17 +1059,53 @@ void ERCMain()
     wheel_servo.SetMin(1200);
     wheel_servo.SetMax(1650);
 
-    //initialize the RCS
+     //initialize the RCS
     RCS.InitializeTouchMenu("1130D8HDL");
 
-    start_protocol(percent, counts);
+    // start_protocol(percent, counts);
 
-    apple_compost(percent, counts, i , target_angle);
+    // apple_compost(percent, counts, i , target_angle);
 
-    apple_nav(percent, counts, i ,target_angle);
+    // apple_nav(percent, counts, i ,target_angle);
+
+    //align on crate
+    percent = turn_power;
+    counts = (CPI*2);
+    move_forward(percent, counts);
+
+    // //back out slightly so basket does not hit back of crate
+    // percent = -turn_power;
+    // counts = (CPI*0.25);
+    // move_forward(percent, counts);
+
+    //lower basket into crate (down 30 degrees, get to 80 degrees)
+    for(i=0; i<75; i++){
+        arm_servo.SetDegree(i);
+        Sleep(0.01);
+    }
+    LCD.Write("arm down");
+
+    //back arm out of basket
+    percent = -turn_power;
+    counts = (CPI*1.5);
+    move_forward(percent, counts);
+
+    //raise arm back up to top
+    for(i; i>0; i--){
+        arm_servo.SetDegree(i);
+        Sleep(0.01);
+    }
+    LCD.Write("raise arm");
+
+    //follow line backwards to turn junction
+    percent = -turn_power;
+    counts = (CPI*11.5); //DOUBLE CHECK
+    move_forward(percent, counts);
 
     choose_lever(percent, counts);
 
     humider_button(percent, counts);
+
+    
 
 }
