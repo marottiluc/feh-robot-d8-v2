@@ -150,180 +150,6 @@ while((TimeNow() - time_start) <= 30)
 
 }
 }
-
-
-//new with backwards
-void blue_button(int percent, int counts)
-{
-    LCD.Clear();
-    LCD.Write("BLUE");
-
-    //turn 180 degrees
-    percent = turn_power;
-    counts = (full_turn_center/1.75);
-    turn_counterclockwise_center(percent, counts);
-
-    //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
-    percent = turn_power;
-    counts = full_turn_about/6;
-    //turn_about_left(percent, counts);
-    turn_about_right(-percent,counts);
-
-//     //drive forward to be aligned on button (CPI*distance)
-//     percent = turn_power;
-//     counts = CPI*3;
-//    // move_forward(percent, counts);
-//     move_forward(-percent, counts);
-
-    Sleep(1.0);
-
-    percent = turn_power;
-    counts = full_turn_about/6;
-    //turn_about_right(percent, counts);
-    turn_about_left(-percent, counts);
-
-    counts = (CPI*2);
-    move_forward(percent, counts);
-    Sleep(1.0);
-
-    percent = drive_power;
-    counts = CPI*3;
-    //move_forward(percent, counts);
-    move_forward(-percent, counts);
-
-    Sleep(1.0);
-
-    percent = -drive_power;
-    counts = CPI*6;
-    //move_forward(percent, counts);
-    move_forward(-percent, counts);
-
-
-}
-
-void red_button(int percent, int counts)
-{
-
-    LCD.Clear();
-    LCD.Write("RED");
-
-    //turn 180 degrees
-    percent = turn_power;
-    counts = (full_turn_center/1.75);
-    turn_counterclockwise_center(percent, counts);
-
-    //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
-    percent = turn_power;
-    counts = (full_turn_about/6);
-    // turn_about_right(percent, counts);
-    turn_about_left(-percent, counts);
-
-    // //drive forward to be aligned on button (CPI*distance)
-    // percent = turn_power;
-    // counts = CPI*3;
-    // // move_forward(percent, counts);
-    // move_forward(-percent, counts);
-
-    percent = turn_power;
-    counts = full_turn_about/6;
-    // turn_about_left(percent, counts);
-    turn_about_right(-percent, counts);
-
-    counts = (CPI*2);
-    move_forward(percent, counts);
-    Sleep(1.0);
-
-    percent = drive_power;
-    counts = CPI*3;
-    //move_forward(percent, counts);
-    move_forward(-percent, counts);
-
-    Sleep(1.0);
-
-    percent = -drive_power;
-    counts = CPI*6;
-    //move_forward(percent, counts);
-    move_forward(-percent, counts);
-
-
-}
-
-void cds_check(int percent, int counts)
-{
-
-int check = 0;
-float value;
-percent = turn_power/2;
-counts = (CPI*0.5);
-
-//if value is red, add to counter
-value = CdS_cell.Value();
-if (value < 0.5) {check += 1;}
-
-//change position and take reading again
-move_forward(percent, counts);
-Sleep(0.75);
-
-value = CdS_cell.Value();
-if (value < 0.5) {check += 1;}
-
-move_forward(percent, counts);
-Sleep(0.75);
-
-value = CdS_cell.Value();
-if (value < 0.5) {check += 1;}
-
-move_forward(percent, counts);
-Sleep(0.75);
-
-value = CdS_cell.Value();
-if (value < 0.5) {check += 1;}
-
-move_forward(percent, counts);
-Sleep(0.75);
-
-value = CdS_cell.Value();
-if (value < 0.5) {check += 1;}
-
-if(check != 0)
-{red_button(percent, counts);}
-
-else
-{blue_button(percent, counts);}
-
-
-}
-
-void read_color(int percent, int counts) //times out after 10 seconds
-{
-float value;
-float time_start = TimeNow();
-
-value = CdS_cell.Value();
-LCD.Clear();
-LCD.Write(value);
-
-while((TimeNow() - time_start) <= 10)
-{
-    //read for color
-    value = CdS_cell.Value();
-    if(value <= 0.5)
-    {
-        red_button(percent, counts);
-        break;
-    }
-
-    else
-    {
-        blue_button(percent, counts);
-        break;
-    }
-
-
-}
-}
-
-
 void follow_line (int percent)
 {
     while(true)
@@ -426,6 +252,260 @@ void follow_line_counts (int percent, int counts)
     left_motor.Stop();
 
 }
+
+
+//new with backwards
+void blue_button(int percent, int counts)
+{
+    LCD.Clear();
+    LCD.Write("BLUE");
+
+    //turn 180 degrees
+    percent = turn_power;
+    counts = (full_turn_center/1.75);
+    turn_counterclockwise_center(percent, counts);
+
+    //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
+    percent = turn_power;
+    counts = full_turn_about/6;
+    //turn_about_left(percent, counts);
+    turn_about_right(-percent,counts);
+
+//     //drive forward to be aligned on button (CPI*distance)
+//     percent = turn_power;
+//     counts = CPI*3;
+//    // move_forward(percent, counts);
+//     move_forward(-percent, counts);
+
+    Sleep(1.0);
+
+    percent = turn_power;
+    counts = full_turn_about/6;
+    //turn_about_right(percent, counts);
+    turn_about_left(-percent, counts);
+
+    counts = (CPI*2);
+    move_forward(percent, counts);
+    Sleep(1.0);
+
+    percent = drive_power;
+    counts = CPI*5;
+    //move_forward(percent, counts);
+    move_forward(-percent, counts);
+
+    Sleep(1.0);
+
+    //2 60 60 4 blue
+    percent = -drive_power;
+    counts = CPI*2;
+    //move_forward(percent, counts);
+    move_forward(-percent, counts);
+
+     Sleep(1.0);
+
+     //turn 180 degrees
+    percent = turn_power;
+    counts = (full_turn_center/1.75);
+    turn_counterclockwise_center(percent, counts);
+
+     percent = drive_power;
+     counts = CPI * 30;
+     move_forward(-percent, counts);
+
+
+//     //added --> from humidifier button go back to line
+//     percent = turn_power;
+//     counts = full_turn_about/6;
+//     //turn_about_right(percent, counts);
+//     turn_about_left(percent, counts);
+
+//      Sleep(1.0);
+
+//     percent = turn_power;
+//     counts = full_turn_about/6;
+//     //turn_about_left(percent, counts);
+//     turn_about_right(percent,counts);
+
+//      Sleep(1.0);
+
+//     percent = turn_power;
+//     counts = CPI*4;
+//    // move_forward(percent, counts);
+//     follow_line_counts(percent, counts);
+
+//      Sleep(1.0);
+
+
+
+
+}
+
+void red_button(int percent, int counts)
+{
+
+    LCD.Clear();
+    LCD.Write("RED");
+
+    //turn 180 degrees
+    percent = turn_power;
+    counts = (full_turn_center/1.75);
+    turn_counterclockwise_center(percent, counts);
+
+    //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
+    percent = turn_power;
+    counts = (full_turn_about/6);
+    // turn_about_right(percent, counts);
+    turn_about_left(-percent, counts);
+
+    // //drive forward to be aligned on button (CPI*distance)
+    // percent = turn_power;
+    // counts = CPI*3;
+    // // move_forward(percent, counts);
+    // move_forward(-percent, counts);
+
+    percent = turn_power;
+    counts = full_turn_about/6;
+    // turn_about_left(percent, counts);
+    turn_about_right(-percent, counts);
+
+    counts = (CPI*2);
+    move_forward(percent, counts);
+    Sleep(1.0);
+
+    percent = drive_power;
+    counts = CPI*5;
+    //move_forward(percent, counts);
+    move_forward(-percent, counts);
+
+    Sleep(1.0);
+
+    //2 60 60 4 red
+    percent = -drive_power;
+    counts = CPI*2;
+    //move_forward(percent, counts);
+    move_forward(-percent, counts);
+
+     Sleep(1.0);
+
+
+    //added --> from humidifier button go back to line
+    percent = turn_power;
+    counts = full_turn_about/6;
+    //turn_about_right(percent, counts);
+    turn_about_right(percent, counts);
+
+     Sleep(1.0);
+
+    percent = turn_power;
+    counts = full_turn_about/6;
+    //turn_about_left(percent, counts);
+    turn_about_left(percent,counts);
+
+     Sleep(1.0);
+
+    percent = turn_power;
+    counts = CPI*4;
+   // move_forward(percent, counts);
+    follow_line_counts(percent, counts);
+
+     Sleep(1.0);
+
+
+}
+
+void cds_check(int percent, int counts)
+{
+
+int check = 0;
+float value;
+percent = turn_power/2;
+counts = (CPI*0.5);
+
+//if value is red, add to counter
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+//change position and take reading again
+move_forward(percent, counts);
+Sleep(0.75);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.75);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.75);
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.75);
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.75);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.75);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.75);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+if(check != 0)
+{red_button(percent, counts);}
+
+else
+{blue_button(percent, counts);}
+
+
+}
+
+void read_color(int percent, int counts) //times out after 10 seconds
+{
+float value;
+float time_start = TimeNow();
+
+value = CdS_cell.Value();
+LCD.Clear();
+LCD.Write(value);
+
+while((TimeNow() - time_start) <= 10)
+{
+    //read for color
+    value = CdS_cell.Value();
+    if(value <= 0.5)
+    {
+        red_button(percent, counts);
+        break;
+    }
+
+    else
+    {
+        blue_button(percent, counts);
+        break;
+    }
+
+
+}
+}
+
+
+
 
 //after apple basket drop back at turn junction
 void left_lever(int percent, int counts)
@@ -562,8 +642,9 @@ Sleep(.5);
     Sleep(.5);
 
     //move 9 inches to junction
-    counts = (CPI*10);
+    counts = (CPI*9.5);
     move_forward(-percent, counts);
+
 
     Sleep(.5);
 }
@@ -1024,6 +1105,110 @@ void humider_button(int percent, int counts)
 
 }
 
+void window(int percent, int counts)
+{
+   
+
+    //rotate 180
+    percent = turn_power;
+    counts = (full_turn_center/1.75);
+    turn_counterclockwise_center(percent, counts);
+
+    Sleep(1.5);
+
+    //shaft encode to wall
+    percent = drive_power;
+    counts = CPI*11;
+    move_forward(-percent,counts);
+
+    Sleep(1.5);
+
+    //move foward a little
+    percent = drive_power;
+    counts = CPI*1;
+    move_forward(percent,counts);
+
+    Sleep(1.5);
+
+    //turn left
+    percent = turn_power;
+    counts = full_turn_about/6;
+    turn_about_left(percent,counts);  
+
+    Sleep(1.5);
+
+    //add a move foward
+     percent = drive_power;
+    counts = CPI*1;
+    move_forward(percent,counts);
+
+    Sleep(1.5);
+
+    //turn right
+    percent = turn_power;
+    counts = full_turn_about/6;
+    turn_about_left(percent,counts);
+
+    Sleep(1.5);
+
+    //move up to window
+    percent = drive_power;
+    counts = CPI*4;
+    follow_line_counts(percent,counts);
+
+    Sleep(1.5);
+
+
+    // servo down
+    window_servo.SetDegree(80);
+    Sleep(.45);
+
+    Sleep(1.5);
+
+    //move window forward
+    percent = drive_power;
+    counts = CPI*4;
+    follow_line_counts(percent,counts);
+
+    Sleep(1.5);
+    //move window back
+     percent = drive_power;
+    counts = CPI*4;
+    follow_line_counts(-percent,counts);
+    Sleep(1.5);
+
+    //servo up
+    window_servo.SetDegree(0);
+    Sleep(.45);
+
+    // move back
+    percent = drive_power;
+    counts = CPI*15;
+    move_forward(-percent,counts);
+    Sleep(1.5);
+
+    counts = CPI*1;
+    move_forward(percent, counts);
+    Sleep(1.5);
+
+    percent = turn_power;
+    counts = full_turn_about/4;
+    turn_about_left(percent, counts);
+    Sleep(1.5);
+
+    counts = CPI *30;
+    move_forward(percent, counts);
+    Sleep(1.5);
+    percent = turn_power;
+    counts = full_turn_about/4;
+    turn_about_left(percent, counts);
+    Sleep(1.5);
+
+    counts = CPI *30;
+    move_forward(percent, counts);
+    Sleep(1.5);
+
+}
 
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1059,53 +1244,99 @@ void ERCMain()
     wheel_servo.SetMin(1200);
     wheel_servo.SetMax(1650);
 
-     //initialize the RCS
-    RCS.InitializeTouchMenu("1130D8HDL");
+    //  //initialize the RCS
+    // RCS.InitializeTouchMenu("1130D8HDL");
 
-    // start_protocol(percent, counts);
+    //  start_protocol(percent, counts);
 
-    // apple_compost(percent, counts, i , target_angle);
+     apple_compost(percent, counts, i , target_angle);
 
-    // apple_nav(percent, counts, i ,target_angle);
+     apple_nav(percent, counts, i ,target_angle);
 
-    //align on crate
-    percent = turn_power;
-    counts = (CPI*2);
-    move_forward(percent, counts);
-
-    // //back out slightly so basket does not hit back of crate
-    // percent = -turn_power;
-    // counts = (CPI*0.25);
+    // //align on crate
+    // percent = turn_power;
+    // counts = (CPI*2);
     // move_forward(percent, counts);
 
-    //lower basket into crate (down 30 degrees, get to 80 degrees)
-    for(i=0; i<75; i++){
-        arm_servo.SetDegree(i);
-        Sleep(0.01);
-    }
-    LCD.Write("arm down");
 
-    //back arm out of basket
-    percent = -turn_power;
-    counts = (CPI*1.5);
-    move_forward(percent, counts);
+    // //lower basket into crate (down 30 degrees, get to 80 degrees)
+    // for(i=0; i<75; i++){
+    //     arm_servo.SetDegree(i);
+    //     Sleep(0.01);
+    // }
+    // LCD.Write("arm down");
 
-    //raise arm back up to top
-    for(i; i>0; i--){
-        arm_servo.SetDegree(i);
-        Sleep(0.01);
-    }
-    LCD.Write("raise arm");
+    // //back arm out of basket
+    // percent = -turn_power;
+    // counts = (CPI*1.5);
+    // move_forward(percent, counts);
 
-    //follow line backwards to turn junction
-    percent = -turn_power;
-    counts = (CPI*11.5); //DOUBLE CHECK
-    move_forward(percent, counts);
+    // //raise arm back up to top
+    // for(i; i>0; i--){
+    //     arm_servo.SetDegree(i);
+    //     Sleep(0.01);
+    // }
+    // LCD.Write("raise arm");
+
+    // //follow line backwards to turn junction
+    // percent = -turn_power;
+    // counts = (CPI*11.5); //DOUBLE CHECK
+    // move_forward(percent, counts);
 
     choose_lever(percent, counts);
 
     humider_button(percent, counts);
 
-    
+    //make sure correct
+    window_servo.SetDegree(80);
+    Sleep(.45);
+
+    counts = CPI*15;
+    move_forward(percent, counts);
+
+    percent = turn_power;
+    counts = full_turn_about/6;
+    turn_about_left(percent, counts);
+    Sleep(1.5);
+
+    counts = CPI*10;
+    move_forward(percent, counts);
+
+    percent = turn_power;
+    counts = full_turn_about/4;
+    turn_about_left(percent, counts);
+    Sleep(1.5);
+
+    counts = CPI*25;
+    move_forward(-percent, counts);
+    Sleep(1.5);
+
+    counts = CPI*1;
+    move_forward(percent, counts);
+
+    percent = turn_power;
+    counts = full_turn_about/4;
+    turn_about_left(percent, counts);
+    Sleep(1.5);
+
+    counts = CPI*30;
+    move_forward(percent, counts);
+    Sleep(1.5);
+
+    counts = CPI*1;
+    move_forward(-percent, counts);
+    Sleep(1.5);
+
+     percent = turn_power;
+    counts = full_turn_about/4;
+    turn_about_left(percent, counts);
+    Sleep(1.5);
+
+    counts = CPI*30;
+    move_forward(percent, counts);
+    Sleep(1.5);
+
+
+    //window(percent,counts);
 
 }
