@@ -276,8 +276,6 @@ void blue_button(int percent, int counts)
     counts = CPI*1;
     move_forward(-percent, counts);
 
-    Sleep(1.0);
-
     percent = turn_power;
     counts = full_turn_about/6;
     //turn_about_right(percent, counts);
@@ -285,33 +283,16 @@ void blue_button(int percent, int counts)
 
     counts = (CPI*2);
     move_forward(percent, counts);
-    Sleep(1.0);
 
-    percent = drive_power;
+    percent = drive_power/2;
     counts = CPI*5;
     //move_forward(percent, counts);
     move_forward(-percent, counts);
 
-    Sleep(1.0);
-
+    percent = drive_power;
     counts = (CPI*2);
     move_forward(percent, counts);
-    Sleep(1.0);
 
-    percent = drive_power;
-    counts = CPI*5;
-    //move_forward(percent, counts);
-    move_forward(-percent, counts);
-
-    Sleep(1.0);
-
-       //2 60 60 4 blue
-    percent = drive_power;
-    counts = CPI*2;
-    //move_forward(percent, counts);
-    move_forward(percent, counts);
-
-     Sleep(1.0);
 
 
     //added --> from humidifier button go back to line
@@ -319,20 +300,14 @@ void blue_button(int percent, int counts)
     counts = full_turn_about/6;
     turn_about_left(percent, counts);
 
-     Sleep(1.0);
-
     percent = turn_power;
     counts = full_turn_about/6;
     turn_about_right(percent,counts);
-
-     Sleep(1.0);
 
     percent = turn_power;
     counts = CPI*4;
    // move_forward(percent, counts);
     follow_line_counts(percent, counts);
-
-     Sleep(1.0);
 
 
 }
@@ -366,33 +341,30 @@ void red_button(int percent, int counts)
 
     counts = (CPI*2);
     move_forward(percent, counts);
-    Sleep(1.0);
 
-    percent = drive_power;
+    percent = drive_power/2;
     counts = CPI*5;
     //move_forward(percent, counts);
     move_forward(-percent, counts);
 
-    Sleep(1.0);
-
+    percent = drive_power;
     counts = (CPI*2);
     move_forward(percent, counts);
-    Sleep(1.0);
 
-    percent = drive_power;
-    counts = CPI*5;
-    //move_forward(percent, counts);
-    move_forward(-percent, counts);
+    // percent = drive_power;
+    // counts = CPI*5;
+    // //move_forward(percent, counts);
+    // move_forward(-percent, counts);
 
-    Sleep(1.0);
+    // Sleep(1.0);
 
-    //2 60 60 4 red
-    percent = drive_power;
-    counts = CPI*2;
-    //move_forward(percent, counts);
-    move_forward(percent, counts);
+    // //2 60 60 4 red
+    // percent = drive_power;
+    // counts = CPI*2;
+    // //move_forward(percent, counts);
+    // move_forward(percent, counts);
 
-     Sleep(1.0);
+    //  Sleep(1.0);
 
 
     //added --> from humidifier button go back to line
@@ -401,21 +373,15 @@ void red_button(int percent, int counts)
     //turn_about_right(percent, counts);
     turn_about_right(percent, counts);
 
-     Sleep(1.0);
-
     percent = turn_power;
-    counts = full_turn_about/6;
+    counts = full_turn_about/8;
     //turn_about_left(percent, counts);
     turn_about_left(percent,counts);
-
-     Sleep(1.0);
 
     percent = turn_power;
     counts = CPI*4;
    // move_forward(percent, counts);
     follow_line_counts(percent, counts);
-
-     Sleep(1.0);
 
 
 }
@@ -551,7 +517,7 @@ move_forward(percent,counts);
 
 arm_servo.SetDegree(60); //for loop later
 
-Sleep(1.5);
+Sleep(0.5);
 
 arm_servo.SetDegree(0);
 
@@ -562,9 +528,9 @@ Sleep(5.0);
 
 arm_servo.SetDegree(90);
 
-Sleep(1.0);
+Sleep(0.5);
 move_forward(percent,counts);
-Sleep(1.0);
+Sleep(0.5);
 
 arm_servo.SetDegree(60);
 
@@ -576,32 +542,32 @@ Sleep(.5);
 
     arm_servo.SetDegree(0);
 
-    Sleep(1.0);
+   Sleep(.5);
 
     //turn counterclockwise
     counts = (full_turn_center/4);
     turn_counterclockwise_center(percent, counts);
 
-    Sleep(1.0);
+   Sleep(.5);
 
     // move back to center line
     // move one inch
     counts = (CPI*4);
     move_forward(-percent, counts);
 
-    Sleep(1.0);
+   Sleep(.5);
 
     //turn back
     //turn 90 degrees
     counts = (full_turn_center/4);
     turn_counterclockwise_center(-percent, counts);
 
-    Sleep(1.0);
+   Sleep(.5);
 
     //move 9 inches to junction
     counts = (CPI*10);
     move_forward(-percent, counts);
-    Sleep(1.0);
+   Sleep(.5);
 
 }
 
@@ -626,7 +592,7 @@ move_forward(percent,counts);
 
 arm_servo.SetDegree(60); //for loop later
 
-Sleep(1.5);
+Sleep(0.5);
 
 arm_servo.SetDegree(0);
 
@@ -637,9 +603,9 @@ Sleep(5.0);
 
 arm_servo.SetDegree(90);
 
-Sleep(1.0);
+Sleep(0.5);
 move_forward(percent,counts);
-Sleep(1.0);
+Sleep(.5);
 
 arm_servo.SetDegree(60);
 
@@ -683,7 +649,7 @@ void right_lever(int percent, int counts)
 
     //set servo up
     arm_servo.SetDegree(0);
-    Sleep(1.0);
+    Sleep(0.5);
 
     //move 90 degrees the other way
     counts = (full_turn_center/4);
@@ -697,7 +663,7 @@ move_forward(percent,counts);
 
 arm_servo.SetDegree(60); //for loop later
 
-Sleep(1.5);
+Sleep(0.5);
 
 arm_servo.SetDegree(0);
 
@@ -710,9 +676,9 @@ Sleep(5.0);
 
 arm_servo.SetDegree(90);
 
-//Sleep(1.0);
+Sleep(.5);
 move_forward(percent,counts);
-//Sleep(1.0);
+Sleep(.5);
 
 arm_servo.SetDegree(60);
 
@@ -897,9 +863,9 @@ void apple_compost(int percent, int counts, int i, int target_angle)
     counts = (CPI*1); //test and modify
     move_forward(percent, counts);
 
-    //67ish degree turn about right
+    //60ish degree turn about right
     percent = turn_power;
-    counts = (full_turn_about/5.5);
+    counts = (full_turn_about/6);
     turn_about_right(percent, counts);
 
     //forward to get past apple basket
@@ -907,9 +873,9 @@ void apple_compost(int percent, int counts, int i, int target_angle)
     counts = (CPI*2.5); //test and modify
     move_forward(percent, counts);
 
-    //67ish degree turn about left
+    //60ish degree turn about left
     percent = turn_power;
-    counts = (full_turn_about/5.5);
+    counts = (full_turn_about/6);
     turn_about_left(percent, counts);
 
     //drive forward into robot and keep motors moving
@@ -919,7 +885,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
 
     //turn on wheel servo forward
     wheel_servo.SetDegree(70);
-    Sleep(2.25);
+    Sleep(2.75);
     LCD.Write("  bin forward");
 
     //pause for a bit
@@ -980,12 +946,12 @@ void apple_nav (int percent, int counts, int i, int target_angle)
 
     //move up ramp and try to catch line
     percent = drive_power-10;
-    counts = (CPI*18);
+    counts = (CPI*19);
     move_forward(percent, counts);
 
     Sleep(0.5);
 
-    //follow along line until 90 degree turn
+    //follow along line until 45 degree turn
     percent = turn_power;
     counts = (CPI*4); //test and modify
     follow_line_counts(percent, counts);
@@ -1087,7 +1053,7 @@ void humider_button(int percent, int counts)
 
     Sleep(1.5);
 
-    counts = (CPI*3.5);
+    counts = (CPI*5);
     move_forward(percent,counts);
 
    
@@ -1108,7 +1074,7 @@ void window(int percent, int counts)
 
     //shaft encode to wall
     percent = drive_power;
-    counts = CPI*11;
+    counts = CPI*25;
     move_forward(-percent,counts);
 
     Sleep(1.5);
@@ -1144,7 +1110,7 @@ void window(int percent, int counts)
     //move up to window
     percent = drive_power;
     counts = CPI*4;
-    follow_line_counts(percent,counts);
+    move_forward(percent,counts);
 
     Sleep(1.5);
 
@@ -1246,58 +1212,58 @@ void ERCMain()
 
     humider_button(percent, counts);
 
-    //make sure correct
-    window_servo.SetDegree(80);
-    Sleep(.45);
+    // //make sure correct
+    // window_servo.SetDegree(80);
+    // Sleep(.45);
 
-    window_servo.Off();
+    // window_servo.Off();
 
-    counts = CPI*15;
-    move_forward(percent, counts);
+    // counts = CPI*15;
+    // move_forward(percent, counts);
 
-    percent = turn_power;
-    counts = full_turn_about/6;
-    turn_about_left(percent, counts);
-    Sleep(1.5);
+    // percent = turn_power;
+    // counts = full_turn_about/6;
+    // turn_about_left(percent, counts);
+    // Sleep(1.5);
 
-    counts = CPI*10;
-    move_forward(percent, counts);
+    // counts = CPI*10;
+    // move_forward(percent, counts);
 
-    percent = turn_power;
-    counts = full_turn_about/4;
-    turn_about_left(percent, counts);
-    Sleep(1.5);
+    // percent = turn_power;
+    // counts = full_turn_about/4;
+    // turn_about_left(percent, counts);
+    // Sleep(1.5);
 
-    counts = CPI*25;
-    move_forward(-percent, counts);
-    Sleep(1.5);
+    // counts = CPI*25;
+    // move_forward(-percent, counts);
+    // Sleep(1.5);
 
-    counts = CPI*1;
-    move_forward(percent, counts);
+    // counts = CPI*1;
+    // move_forward(percent, counts);
 
-    percent = turn_power;
-    counts = full_turn_about/4;
-    turn_about_left(percent, counts);
-    Sleep(1.5);
+    // percent = turn_power;
+    // counts = full_turn_about/4;
+    // turn_about_left(percent, counts);
+    // Sleep(1.5);
 
-    counts = CPI*30;
-    move_forward(percent, counts);
-    Sleep(1.5);
+    // counts = CPI*30;
+    // move_forward(percent, counts);
+    // Sleep(1.5);
 
-    counts = CPI*1;
-    move_forward(-percent, counts);
-    Sleep(1.5);
+    // counts = CPI*1;
+    // move_forward(-percent, counts);
+    // Sleep(1.5);
 
-     percent = turn_power;
-    counts = full_turn_about/4;
-    turn_about_left(percent, counts);
-    Sleep(1.5);
+    //  percent = turn_power;
+    // counts = full_turn_about/4;
+    // turn_about_left(percent, counts);
+    // Sleep(1.5);
 
-    counts = CPI*30;
-    move_forward(percent, counts);
-    Sleep(1.5);
+    // counts = CPI*30;
+    // move_forward(percent, counts);
+    // Sleep(1.5);
 
 
-    //window(percent,counts);
+    window(percent,counts);
 
 }
