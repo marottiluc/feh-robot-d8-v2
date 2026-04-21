@@ -9,8 +9,8 @@
 #define CPI 33.74
 #define TR 3.5
 #define pi 3.14159
-#define turn_power -25
-#define drive_power -40
+#define turn_power -30
+#define drive_power -45
 #define servo_min 500
 #define servo_max 1561
 #define full_turn_center  (CPI*TR*2*pi)
@@ -202,6 +202,7 @@ void follow_line_counts (int percent, int counts)
     float time_start = TimeNow();
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
+    int state = 0;
 
     while(((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts) && ((TimeNow() - time_start) <= 5))
     {
@@ -227,20 +228,60 @@ void follow_line_counts (int percent, int counts)
         {
         right_motor.SetPercent(-(percent-5));
         left_motor.SetPercent(percent);
+        state = 1;
         }
 
         else if ((left_opto.Value() >= 4.2))
         {
         left_motor.SetPercent(-(percent-5));
         right_motor.SetPercent(percent);
+        state = 2;
         }
 
         else if(center_opto.Value() > 4.2)
         {
         right_motor.SetPercent(percent);
         left_motor.SetPercent(percent);
+        state = 0;
         }
+
+        // else
+        // {
+        //     if(state = 1)
+        //     {
+        //     left_motor.SetPercent(-(percent-5));
+        //     right_motor.SetPercent(percent); 
+        //     state = 0;
+        //     Sleep(0.1);
+        
+        //     }
+        //     else if (state = 2)
+        //     {
+        //     right_motor.SetPercent(-(percent-5));
+        //     left_motor.SetPercent(percent);
+        //     state = 0;
+        //     Sleep(0.1);
+        //     }
+
+        // }
        
+        // else
+        // {
+        // while()
+        // left_motor.SetPercent(-((percent/2)-5));
+        // right_motor.SetPercent((percent/2));
+        // Sleep(0.1);
+        // right_motor.SetPercent(-((percent/2)-5));
+        // left_motor.SetPercent((percent/2));
+        // Sleep(0.1);
+        // right_motor.SetPercent(-((percent/2)-5));
+        // left_motor.SetPercent((percent/2));
+        // Sleep(0.1);
+        // left_motor.SetPercent(-((percent/2)-5));
+        // right_motor.SetPercent((percent/2));
+        // Sleep(0.1);
+
+        // }
        
     }
    
@@ -267,17 +308,17 @@ void blue_button(int percent, int counts)
 
     //turn to get towards red button (needs CPI*TR*2*pi/(portion of turn))
     percent = turn_power;
-    counts = full_turn_about/6;
+    counts = full_turn_about/6.15;
     //turn_about_left(percent, counts);
     turn_about_right(-percent,counts);
 
     //drive forward to be aligned on button (CPI*distance)
     percent = turn_power;
-    counts = CPI*1;
+    counts = CPI*0.5;
     move_forward(-percent, counts);
 
     percent = turn_power;
-    counts = full_turn_about/6;
+    counts = full_turn_about/6.15;
     //turn_about_right(percent, counts);
     turn_about_left(-percent, counts);
 
@@ -299,6 +340,11 @@ void blue_button(int percent, int counts)
     percent = turn_power;
     counts = full_turn_about/6;
     turn_about_left(percent, counts);
+
+    percent = turn_power;
+    counts = (CPI*2);
+    move_forward(percent, counts);
+
 
     percent = turn_power;
     counts = full_turn_about/6;
@@ -331,7 +377,7 @@ void red_button(int percent, int counts)
 
     //drive forward to be aligned on button (CPI*distance)
     percent = turn_power;
-    counts = CPI*1;
+    counts = CPI*0.5;
     move_forward(-percent, counts);
 
     percent = turn_power;
@@ -374,6 +420,10 @@ void red_button(int percent, int counts)
     turn_about_right(percent, counts);
 
     percent = turn_power;
+    counts = (CPI*2);
+    move_forward(percent, counts);
+
+    percent = turn_power;
     counts = full_turn_about/8;
     //turn_about_left(percent, counts);
     turn_about_left(percent,counts);
@@ -400,41 +450,49 @@ if (value < 0.5) {check += 1;}
 
 //change position and take reading again
 move_forward(percent, counts);
-Sleep(0.75);
+Sleep(0.25);
 
 value = CdS_cell.Value();
 if (value < 0.5) {check += 1;}
 
 move_forward(percent, counts);
-Sleep(0.75);
+Sleep(0.25);
 
 value = CdS_cell.Value();
 if (value < 0.5) {check += 1;}
 
 move_forward(percent, counts);
-Sleep(0.75);
-value = CdS_cell.Value();
-if (value < 0.5) {check += 1;}
-
-move_forward(percent, counts);
-Sleep(0.75);
-value = CdS_cell.Value();
-if (value < 0.5) {check += 1;}
-
-move_forward(percent, counts);
-Sleep(0.75);
+Sleep(0.25);
 
 value = CdS_cell.Value();
 if (value < 0.5) {check += 1;}
 
 move_forward(percent, counts);
-Sleep(0.75);
+Sleep(0.25);
 
 value = CdS_cell.Value();
 if (value < 0.5) {check += 1;}
 
 move_forward(percent, counts);
-Sleep(0.75);
+Sleep(0.25);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.25);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.25);
+
+value = CdS_cell.Value();
+if (value < 0.5) {check += 1;}
+
+move_forward(percent, counts);
+Sleep(0.25);
 
 value = CdS_cell.Value();
 if (value < 0.5) {check += 1;}
@@ -497,16 +555,16 @@ percent = turn_power;
 counts = (full_turn_center/8);
 turn_counterclockwise_center(percent, counts);
 
-counts = (CPI*10.75);
+counts = (CPI*10.25);
 move_forward(percent, counts);
 
 counts = (full_turn_center/3.8);
 turn_counterclockwise_center(percent, counts);
 
-counts = (CPI*4);
+counts = (CPI*5);
 move_forward(percent, counts);
 
-counts = (full_turn_center/4);
+counts = (full_turn_center/3.8);
 turn_counterclockwise_center(-percent, counts);
 
 counts = (CPI*.5); //changed
@@ -540,13 +598,13 @@ Sleep(.5);
     counts = (CPI*3.5);
     move_forward(-percent,counts);
 
-    arm_servo.SetDegree(0);
-
    Sleep(.5);
 
     //turn counterclockwise
     counts = (full_turn_center/4);
     turn_counterclockwise_center(percent, counts);
+
+    arm_servo.SetDegree(0);
 
    Sleep(.5);
 
@@ -832,11 +890,11 @@ void apple_compost(int percent, int counts, int i, int target_angle)
     // LCD.Write("  follow");
 
     //drive into basket to grab
-    percent = turn_power;
+    percent = turn_power/2;
     counts = (CPI*1.75);
     move_forward(percent, counts);
     LCD.Write("  grab basket");
-    Sleep(1.0);
+    Sleep(0.5);
 
     //raise arm 20 degrees
     for(i; i>0; i--){
@@ -844,7 +902,7 @@ void apple_compost(int percent, int counts, int i, int target_angle)
         Sleep(0.01);
     }
     LCD.Write("raise arm");
-    Sleep(1.5);
+    Sleep(0.5);
 
     //back up from bin to make turn
     percent = -turn_power;
@@ -879,13 +937,13 @@ void apple_compost(int percent, int counts, int i, int target_angle)
     turn_about_left(percent, counts);
 
     //drive forward into robot and keep motors moving
-    percent = turn_power/2;
+    percent = -12.5;
     right_motor.SetPercent(percent);
     left_motor.SetPercent(percent);
 
     //turn on wheel servo forward
     wheel_servo.SetDegree(70);
-    Sleep(2.75);
+    Sleep(2.5);
     LCD.Write("  bin forward");
 
     //pause for a bit
@@ -946,10 +1004,8 @@ void apple_nav (int percent, int counts, int i, int target_angle)
 
     //move up ramp and try to catch line
     percent = drive_power-10;
-    counts = (CPI*19);
+    counts = (CPI*18.25);
     move_forward(percent, counts);
-
-    Sleep(0.5);
 
     //follow along line until 45 degree turn
     percent = turn_power;
@@ -986,13 +1042,19 @@ void apple_nav (int percent, int counts, int i, int target_angle)
 
     //follow line to apple crate
     percent = turn_power;
-    counts = (CPI*14); //test and modify
+    counts = (CPI*6); //test and modify
     follow_line_counts(percent, counts);
     LCD.Write("caught line");
 
+    //correction?
+    percent = turn_power;
+    counts = (full_turn_about/12);
+    turn_about_left(percent, counts);
+    turn_about_right(percent, counts);
+
     //align on crate
     percent = turn_power;
-    counts = (CPI*2);
+    counts = (CPI*10);
     move_forward(percent, counts);
 
     // //back out slightly so basket does not hit back of crate
@@ -1051,9 +1113,9 @@ void humider_button(int percent, int counts)
     counts = (CPI*4.5);
     follow_line_counts(percent, counts);
 
-    Sleep(1.5);
+    Sleep(0.5);
 
-    counts = (CPI*5);
+    counts = (CPI*4.5);
     move_forward(percent,counts);
 
    
@@ -1067,75 +1129,59 @@ void window(int percent, int counts)
 
     //rotate 180
     percent = turn_power;
-    counts = (full_turn_center/1.75);
+    counts = (full_turn_center/1.9);
     turn_counterclockwise_center(percent, counts);
-
-    Sleep(1.5);
 
     //shaft encode to wall
     percent = drive_power;
     counts = CPI*25;
     move_forward(-percent,counts);
 
-    Sleep(1.5);
-
     //move foward a little
     percent = drive_power;
     counts = CPI*1;
     move_forward(percent,counts);
-
-    Sleep(1.5);
 
     //turn left
     percent = turn_power;
     counts = full_turn_about/6;
     turn_about_left(percent,counts);  
 
-    Sleep(1.5);
-
     //add a move foward
      percent = drive_power;
-    counts = CPI*1;
+    counts = CPI*2.5;
     move_forward(percent,counts);
-
-    Sleep(1.5);
 
     //turn right
     percent = turn_power;
     counts = full_turn_about/6;
     turn_about_right(percent,counts);
 
-    Sleep(1.5);
-
     //move up to window
     percent = drive_power;
+    counts = CPI*6.75;
+    move_forward(percent,counts);
+
+    // servo down
+    window_servo.SetDegree(75);
+    Sleep(0.4);
+    window_servo.Off();
+    LCD.Write("SERVO");
+
+    //move window forward
+    percent = turn_power;
     counts = CPI*4;
     move_forward(percent,counts);
 
-    Sleep(1.5);
+    Sleep(1.0);
 
-
-    // servo down
-    window_servo.SetDegree(80);
-    Sleep(.45);
-    window_servo.Off();
-
-    Sleep(1.5);
-
-    //move window forward
-    percent = drive_power;
-    counts = CPI*4;
-    follow_line_counts(percent,counts);
-
-    Sleep(1.5);
     //move window back
-     percent = drive_power;
+    percent = turn_power;
     counts = CPI*4;
-    follow_line_counts(-percent,counts);
-    Sleep(1.5);
+    move_forward(-percent,counts);
 
     //servo up
-    window_servo.SetDegree(0);
+    window_servo.SetDegree(100);
     Sleep(.45);
     window_servo.Off();
 
@@ -1143,28 +1189,35 @@ void window(int percent, int counts)
     percent = drive_power;
     counts = CPI*15;
     move_forward(-percent,counts);
-    Sleep(1.5);
+
 
     counts = CPI*1;
     move_forward(percent, counts);
-    Sleep(1.5);
+
 
     percent = turn_power;
     counts = full_turn_about/4;
     turn_about_left(percent, counts);
-    Sleep(1.5);
 
-    counts = CPI *30;
-    move_forward(percent, counts);
-    Sleep(1.5);
-    percent = turn_power;
-    counts = full_turn_about/4;
-    turn_about_left(percent, counts);
-    Sleep(1.5);
 
-    counts = CPI *30;
+    counts = CPI*21;
     move_forward(percent, counts);
-    Sleep(1.5);
+
+    counts = full_turn_center/1.75;
+    turn_counterclockwise_center(-percent, counts);
+
+    percent = drive_power;
+    counts = CPI*14;
+    move_forward(-percent, counts);
+
+    // percent = turn_power;
+    // counts = full_turn_about/4;
+    // turn_about_left(percent, counts);
+
+
+    // counts = CPI *30;
+    // move_forward(percent, counts);
+
 
 }
 
@@ -1211,58 +1264,6 @@ void ERCMain()
     choose_lever(percent, counts);
 
     humider_button(percent, counts);
-
-    // //make sure correct
-    // window_servo.SetDegree(80);
-    // Sleep(.45);
-
-    // window_servo.Off();
-
-    // counts = CPI*15;
-    // move_forward(percent, counts);
-
-    // percent = turn_power;
-    // counts = full_turn_about/6;
-    // turn_about_left(percent, counts);
-    // Sleep(1.5);
-
-    // counts = CPI*10;
-    // move_forward(percent, counts);
-
-    // percent = turn_power;
-    // counts = full_turn_about/4;
-    // turn_about_left(percent, counts);
-    // Sleep(1.5);
-
-    // counts = CPI*25;
-    // move_forward(-percent, counts);
-    // Sleep(1.5);
-
-    // counts = CPI*1;
-    // move_forward(percent, counts);
-
-    // percent = turn_power;
-    // counts = full_turn_about/4;
-    // turn_about_left(percent, counts);
-    // Sleep(1.5);
-
-    // counts = CPI*30;
-    // move_forward(percent, counts);
-    // Sleep(1.5);
-
-    // counts = CPI*1;
-    // move_forward(-percent, counts);
-    // Sleep(1.5);
-
-    //  percent = turn_power;
-    // counts = full_turn_about/4;
-    // turn_about_left(percent, counts);
-    // Sleep(1.5);
-
-    // counts = CPI*30;
-    // move_forward(percent, counts);
-    // Sleep(1.5);
-
 
     window(percent,counts);
 
